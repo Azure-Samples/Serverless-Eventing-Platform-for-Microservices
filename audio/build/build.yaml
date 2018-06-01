@@ -1,0 +1,63 @@
+# Builds the ContentReactor audio microservice resources
+
+name: $(BuildID)
+steps:
+
+  # Build the APIs
+  - task: DotNetCoreCLI@1
+    displayName: Run dotnet restore
+    inputs:
+      command: "restore"
+      projects: "audio/src/**/*.csproj"
+
+  - task: DotNetCoreCLI@1
+    displayName: Run dotnet build
+    inputs:
+      projects: "audio/src/**/*.csproj"
+
+  - task: DotNetCoreCLI@1
+    displayName: Run dotnet publish
+    inputs:
+      command: "publish"
+      publishWebProjects: "False"
+      projects: "audio/src/**/*Api.csproj"
+      arguments: "--output $(build.artifactstagingdirectory)"
+      zipAfterPublish: "True"
+
+  # Run Unit Tests
+  - task: DotNetCoreCLI@1
+    displayName: Run dotnet test on Audio Microservice
+    inputs:
+      command: "test"
+      projects: "audio/src/**/*.Tests.csproj"
+      arguments: "--logger trx;logfilename=testresults.xml"
+  
+  - task: DotNetCoreCLI@1
+    displayName: Run dotnet test on Shared Code
+    inputs:
+      command: "test"
+      projects: "shared/src/**/*.Tests.csproj"
+      arguments: "--logger trx;logfilename=testresults.xml"
+  
+  - task: PublishTestResults@2
+    displayName: Publish Test Results
+    inputs:
+      testRunner: 'VSTest'
+      testResultsFiles: '**/testresults.xml'
+    condition: always()
+
+  # Publish the APIs as an artifact
+  - task: PublishBuildArtifacts@1
+    displayName: Publish Azure Functions
+    inputs:
+      pathToPublish: $(build.artifactstagingdirectory)
+      artifactName: functions
+      artifactType: container
+
+  # Publish the `deploy` folder as an artifact
+  - task: PublishBuildArtifacts@1
+    displayName: Publish Deployment Scripts
+    inputs:
+      pathToPublish: audio/deploy
+      artifactName: deploy
+      artifactType: container

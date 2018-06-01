@@ -1,0 +1,197 @@
+<body>
+    <header>
+      <div class="collapse bg-dark" id="navbarHeader">
+        <div class="container">
+          <div class="row">
+            <div class="col-sm-8 col-md-7 py-4">
+              <h4 class="text-white">About</h4>
+              <p class="text-muted">Add some information about the album below, the author, or any other background context. Make it a few sentences long so folks can pick up some informative tidbits. Then, link them off to some social networking sites or contact information.</p>
+            </div>
+            <div class="col-sm-4 offset-md-1 py-4">
+              <h4 class="text-white">Contact</h4>
+              <ul class="list-unstyled">
+                <li><a href="#" class="text-white">Follow on Twitter</a></li>
+                <li><a href="#" class="text-white">Like on Facebook</a></li>
+                <li><a href="#" class="text-white">Email me</a></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="navbar navbar-dark bg-dark box-shadow">
+        <div class="container d-flex justify-content-between">
+          <a href="#" class="navbar-brand d-flex align-items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
+            <strong>Welcome {{displayUserId}}</strong>
+          </a>
+          <button class="navbar-toggler" type="button" (click)="logout()">
+              <span>Logout</span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    
+    <section class="jumbotron text-center">
+        <div class="container">
+          <br>
+          <h1 class="jumbotron-heading">{{injectedCategoryName}} List</h1>
+          <p class="lead text-muted">Add your favorite images, audio and text!</p>
+        </div>
+        <br>
+        <div class="container">
+            <!-- Add Image/Audio/Text Section -->
+            <div class="row" >
+                <div class="col-lg-4">
+                  <i class="fas fa-camera fa-2x" style="margin-bottom:15px"></i>
+                  <p><label for="imageUpload" class="btn btn-primary">Add Image</label></p>
+                </div>
+                <div class="col-lg-4">
+                  <i class="fas fa-music fa-2x button-wrapper" style="margin-bottom:15px"></i>
+                  <p><label for="audioUpload" class="btn btn-primary">Add Audio</label></p>
+                </div>
+                <div class="col-lg-4">
+                  <i class="fas fa-file-alt fa-2x" style="margin-bottom:15px"></i>
+                  <p><button type="button" class="btn btn-primary" (click)="openSubmitTextModal(submitTextContent)">Add Text</button></p>
+                </div>
+            </div> 
+
+              <!-- File Upload Section -->
+              <div class="row">
+                  <div class="col-lg-1">
+                  </div>
+                  <div class="col-lg-11">
+                      <input type="file" id="imageUpload" (change)="updateFile($event)" style="visibility: hidden">
+                      <label>{{imageErrorMessage}}</label> 
+                  </div>   
+                  <div class="col-lg-11">
+                      <input type="file" id="audioUpload" (change)="updateAudioFile($event)" style="visibility: hidden">
+                      <label>{{audioErrorMessage}}</label> 
+                  </div>       
+              </div>
+
+              <!-- Submit Image/Audio/Text Section -->
+              <div *ngIf="!showHorizontalSpinner" class="row" >
+                  <div style="margin-top:15px" class="col-lg-4">
+                  </div>
+                  <div *ngIf="showSubmit" class="col-lg-4" style="margin-top:15px">
+                    <img  *ngIf="showSubmit" class="img-thumbnail" src="{{previewImage}}" alt="Your Image">
+                    <button style="margin-top:10px" *ngIf="showSubmit" type="button" class="btn btn-primary" (click)="onImageFileSubmit(); showSubmit=false; showHorizontalSpinner=true;">Submit</button>
+                  </div>
+              </div>
+              <div *ngIf="!showHorizontalSpinner" class="row" >
+                  <div style="margin-top:10px" class="col-lg-4">
+                  </div>
+                  <div *ngIf="showAudio" class="col-lg-4">
+                    <label *ngIf="showAudio">{{audioFileName}}</label>
+                    <button style="margin-top:10px" *ngIf="showAudio" type="button" class="btn btn-primary" (click)="onAudioFileSubmit(); showAudio=false; showHorizontalSpinner=true;">Submit</button>
+                  </div>
+              </div>
+              <div *ngIf="showHorizontalSpinner" class="lead text-muted"><p class="text-center">{{spinnerMessage}}</p></div>
+              <div class="row text-center">
+                <div *ngIf="showHorizontalSpinner" class="spinner">
+                  <div class="rect1"></div>
+                  <div class="rect2"></div>
+                  <div class="rect3"></div>
+                  <div class="rect4"></div>
+                  <div class="rect5"></div>
+                </div>
+              </div>
+              <ng-template #submitTextContent let-c="close" let-d="dismiss">
+                  <div class="modal-header">
+                    <h4 class="modal-title">Your Note</h4>
+                  </div>
+                  <div class="modal-body">
+                    <p><textarea style="width:468px;height:400px" class="form-control" type="text" [(ngModel)]="inputText"></textarea></p>
+                  </div>
+                  <div class="modal-footer">
+                    <button  type="button" class="btn btn-outline-dark" (click)="onClickSubmitText(); this.showHorizontalSpinner = true; c('Close click')">Submit</button>
+                    <button type="button" class="btn btn-outline-dark" (click)="c('Close click')">Close</button>
+                  </div>
+              </ng-template>
+          </div>
+    </section>
+    <br>
+
+    <!-- ITEMS DISPLAY SECTION -->
+    <main role="main">
+      <div class="container">
+        <div *ngIf="loaded" class="row">
+
+            <!-- List all Images -->
+            <div  *ngFor="let item of image_items"  class="col-md-4 text-center">
+                <img  *ngIf="item.showImage" [ngClass]="{'is-active': item.isActive}" class="border border-light circle-img rounded-circle" src="{{item.previewUrl}}">
+                <button *ngIf="item.showNotification" type="button" (click)="onClickImageNotification(item.id)" class="btn btn-secondary close img_wrp">
+                   <i data-toggle="tooltip" title="Your image caption is ready!" class="fa fa-bell faa-ring animated fa-1x customtooltip" style="color:red"></i>
+                </button>          
+                <div  *ngIf="item.showImage && !showHorizontalSpinner" class="middle">
+                    <button type="button" class="btn btn-secondary" (click)="onClickDeleteImage(item.id); showHorizontalSpinner=true;"><i class="fa fa-trash-alt"></i></button>
+                </div>
+                <div *ngIf="!item.showImage" class="circle-img rounded-circle spinner-middle">
+                      <i class="fa fa-spinner fa-spin" style="font-size:48px;color:grey"></i>
+                </div>
+                <div style="margin-top:10px">
+                  <h6 class="text-center"><i>{{item.caption}}</i></h6>
+                </div>
+            </div>
+
+            <!-- List all Text -->
+            <div  *ngFor="let item of text_items"  class="col-md-4 text-center">
+                <div [ngClass]="{'is-active': item.isActive}" class="border border-light circle-img img-circle img_wrp sidebar-box">
+                    <p class="lead" style="font-size:16px">{{item.text}}</p>
+                    <p class="read-more"><a href="#" class="button"></a></p>
+                </div>
+                <button *ngIf="item.showNotification" type="button" class="btn btn-secondary">
+                  <i data-toggle="tooltip" title="Your text is ready!" class="fa fa-bell faa-ring animated fa-1x close" (click)="onClickTextNotification(item.id)" style="color:red"></i>
+                </button>
+                <div *ngIf="!showHorizontalSpinner" class="middle">
+                    <button type="button" class="btn btn-secondary" (click)="open(content,item.id);"><i class="fa fa-eye"></i></button>
+                    <button type="button" class="btn btn-secondary" (click)="onClickDeleteText(item.id); showHorizontalSpinner=true;"><i class="fa fa-trash-alt"></i></button>
+                </div>
+                <ng-template #content let-c="close" let-d="dismiss">
+                    <div class="modal-header">
+                      <h4 class="modal-title">Your Note</h4>
+                    </div>
+                    <div class="modal-body">
+                      <p *ngIf="!update">{{currentText}}</p>
+                      <p *ngIf="update"><textarea style="width:468px;height:400px" class="form-control" type="text" [(ngModel)]="currentText"></textarea></p>
+                    </div>
+                    <div class="modal-footer">
+                      <button *ngIf="!update" type="button" class="btn btn-outline-dark" (click)="update=true">Update</button>
+                      <button *ngIf="update" type="button" class="btn btn-outline-dark" (click)="onClickUpdateText(item.id); c('Close click')">Submit</button>
+                      <button *ngIf="update" type="button" class="btn btn-outline-dark" (click)="update=false">Cancel</button>
+                      <button type="button" class="btn btn-outline-dark" (click)="c('Close click')">Close</button>
+                    </div>
+                </ng-template>
+            </div>
+
+            <!-- List all Audio -->
+            <div  *ngFor="let item of audio_items"  class="col-md-4 text-center">
+                <img  [ngClass]="{'is-active': item.isActive}" class="circle-img img-circle img_wrp" src="assets/images/audio.png">
+                <button *ngIf="item.showNotification" type="button" (click)="onClickAudioNotification(item.id)" class="btn btn-secondary close img_wrp">
+                    <i data-toggle="tooltip" title="Your audio transcript is ready!" class="fa fa-bell faa-ring animated fa-1x" style="color:red"></i>
+                </button>
+                <div *ngIf="!showHorizontalSpinner" class="middle">
+                    <button type="button" class="btn btn-secondary" (click)="openAudio(content,item.id);"><i class="fa fa-eye"></i></button>
+                    <button type="button" class="btn btn-secondary" (click)="onClickDeleteAudio(item.id); showHorizontalSpinner=true;"><i class="fa fa-trash-alt"></i></button>
+                </div>
+                <ng-template #content let-c="close" let-d="dismiss">
+                    <div class="modal-header">
+                      <h4 class="modal-title">Your Audio Transcript</h4>
+                    </div>
+                    <div class="modal-body">
+                      <p *ngIf="!update">{{currentTranscript}}</p>
+                      <audio controls>
+                          <source src="{{item.audioUrl}}" type="audio/wav">
+                      </audio>
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-outline-dark" (click)="c('Close click')">Close</button>
+                    </div>
+                </ng-template>
+            </div>
+        </div>
+      </div>
+    </main>
+</body>
+

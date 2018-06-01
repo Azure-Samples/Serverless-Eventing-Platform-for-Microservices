@@ -1,0 +1,13 @@
+{
+  "_type": "Images",
+  "instrumentation": {
+    "_type": "ResponseInstrumentation"
+  },
+  "value": [],
+  "pivotSuggestions": [
+    {
+      "pivot": "xyz",
+      "suggestions": []
+    }
+  ]
+}

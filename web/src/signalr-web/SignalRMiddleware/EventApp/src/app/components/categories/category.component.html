@@ -1,0 +1,109 @@
+<body>
+    <header>
+      <div class="collapse bg-dark" id="navbarHeader">
+        <div class="container">
+          <div class="row">
+            <div class="col-sm-8 col-md-7 py-4">
+              <h4 class="text-white">About</h4>
+              <p class="text-muted">Add some information about the album below, the author, or any other background context. Make it a few sentences long so folks can pick up some informative tidbits. Then, link them off to some social networking sites or contact information.</p>
+            </div>
+            <div class="col-sm-4 offset-md-1 py-4">
+              <h4 class="text-white">Contact</h4>
+              <ul class="list-unstyled">
+                <li><a href="#" class="text-white">Follow on Twitter</a></li>
+                <li><a href="#" class="text-white">Like on Facebook</a></li>
+                <li><a href="#" class="text-white">Email me</a></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="navbar navbar-dark bg-dark box-shadow">
+        <div class="container d-flex justify-content-between">
+          <a href="#" class="navbar-brand d-flex align-items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
+            <strong>Welcome {{displayUserId}}</strong>
+          </a>
+          <button class="navbar-toggler" type="button" (click)="logout()">
+            <span>Logout</span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <main role="main">
+      <!-- INPUT JUMBOTRON -->
+      <section class="jumbotron text-center">
+        <div class="container">
+          <br><br><br>
+          <h1 class="jumbotron-heading">Categories</h1>
+          <p class="lead text-muted">Start your Content journey!</p>
+          <p>
+            <input type="text" id="categoryName" name="categoryName" 
+            [(ngModel)]="categoryName" class="form-control" placeholder="Category Name" required autofocus>
+            <br>
+            <button [disabled]="categoryName == ''" type="button" class="btn btn-primary my-2" (click)="onClickAddCategory()">
+                    Add a Category
+            </button>
+          </p>
+          <br><br><br><br>
+          <div class="text-center" *ngIf="!loaded">
+              <div *ngIf="!loaded" class="lead text-muted"><p class="text-center">Loading...</p></div>
+              <div class="row text-center">
+                <div *ngIf="!loaded" class="spinner">
+                  <div class="rect1"></div>
+                  <div class="rect2"></div>
+                  <div class="rect3"></div>
+                  <div class="rect4"></div>
+                  <div class="rect5"></div>
+                </div>
+              </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- CATEGORIES LIST -->
+      <div *ngIf="loaded" class="album py-5 bg-light">
+        <div class="container">
+          <div class="row">
+            <div *ngFor="let item of categoriesList" [ngClass]="{'is-active': item.isActive}" class="col-md-4 notification-item">
+              <div class="card mb-4 box-shadow">
+                <span data-toggle="tooltip" title="{{item.notifications}} item(s) is updated!" *ngIf="item.showNotification" (click)="onClickClearNotifications(item.id)" class="notify-badge">{{item.notifications}}</span>
+                  
+               <div class="view">
+                <img class="card-img-top circle-img" src={{item.imageUrl}} alt={{item.name}} @fadeshow>
+                <div *ngIf="!item.editMode && item.showCategory" class="middle badge badge-primary">
+                    <h4>{{item.name}}</h4>
+                </div>
+                <div *ngIf="!item.editMode && !item.showCategory" class="middle">
+                    <p><i class="fa fa-spinner fa-spin" style="font-size:70px;color:grey"></i></p>
+                </div>
+                
+                <div *ngIf="item.editMode && item.isActive" class="middle active">
+                    <input type="text" id="item.name" name="item.name" [(ngModel)]="updatedCategoryName" 
+                    class="form-control" placeholder="Category Name" required autofocus>
+                    <button class="btn btn-primary my-2" (click)="onClickUpdateCategory(item.id); item.editMode = false">Save</button>
+                    <button class="btn btn-primary my-2" (click)="item.editMode = false">Cancel</button>
+                </div>
+               </div>
+
+
+              <div class="card-body" class="active" *ngIf="item.isActive"  @fadeshow>
+                 <p class="card-text"><span class="badge badge-light" [(ngModel)]="item.synonyms" ngAnimate="{enter: 'repeat-enter',
+                    leave: 'repeat-leave'}" *ngFor="let synonym of item.synonyms| slice:0:5" ngDefaultControl>{{synonym}}</span></p>
+                 <div class="d-flex justify-content-between align-items-center">
+                    <div class="btn-group">
+                      <button type="button" class="active" *ngIf="item.isActive" class="btn btn-sm btn-outline-secondary" (click)="item.editMode = true">Edit</button>
+                      <button type="button" class="active" *ngIf="item.isActive" class="btn btn-sm btn-outline-secondary" (click)="onClickDeleteCategory(item.id)">Delete</button>
+                    </div>
+                      <button type="button" class="active" *ngIf="item.isActive" class="btn btn-sm btn-outline-secondary" (click)="onClickViewCategory(item.id)">View</button>
+                 </div>
+              </div>
+              
+            </div>
+          </div>
+        </div>
+      </div> 
+    </div>
+   </main>
+  </body>

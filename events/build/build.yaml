@@ -1,0 +1,18 @@
+# Builds the ContentReactor event system resources
+
+name: $(BuildID)
+phases:
+
+- phase: Build
+  displayName: Build
+  queue:
+    name: Hosted VS2017
+  steps:
+  
+    # Publish the `deploy` folder as an artifact
+    - task: PublishBuildArtifacts@1
+      displayName: Publish Deployment Scripts
+      inputs:
+        pathToPublish: events/deploy
+        artifactName: deploy
+        artifactType: container

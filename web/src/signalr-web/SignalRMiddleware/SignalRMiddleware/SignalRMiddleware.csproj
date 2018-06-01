@@ -1,0 +1,42 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <TypeScriptToolsVersion>2.8</TypeScriptToolsVersion>
+    <TypeScriptCompileBlocked>false</TypeScriptCompileBlocked>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="event-app\**" />
+    <Compile Remove="EventApp\**" />
+    <Content Remove="event-app\**" />
+    <Content Remove="EventApp\**" />
+    <EmbeddedResource Remove="event-app\**" />
+    <EmbeddedResource Remove="EventApp\**" />
+    <None Remove="event-app\**" />
+    <None Remove="EventApp\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.3.0" />
+    <PackageReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.1.0" PrivateAssets="All" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="wwwroot\" />
+  </ItemGroup>
+
+  <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
+    <Exec Command="echo &quot;cd $(SolutionDir)EventApp&quot; &amp;&amp;^&#xD;&#xA;cd &quot;$(SolutionDir)EventApp&quot; &amp;&amp;^&#xD;&#xA;echo &quot;building EventApp&quot; &amp;&amp;^&#xD;&#xA;npm run dev &amp;&amp;^" />
+  </Target>
+  
+  <Target Name="AngularClean" AfterTargets="Clean">
+      <Message Text="Cleaning web app..." Importance="high" />
+    <ItemGroup>
+        <FilesToDelete Include="$(ProjectDir)wwwroot\*.*" />
+    </ItemGroup>
+    <Delete Files="@(FilesToDelete)" />
+  </Target>
+
+</Project>

@@ -1,0 +1,125 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+
+      "uniqueResourceNameSuffix": {
+        "type": "string",
+        "defaultValue": "[uniqueString(subscription().subscriptionId, resourceGroup().id)]"
+      },
+      "functionAppProxyName":{
+        "type": "string"
+      },
+      "applicationInsightsLocation": {
+        "type": "string",
+        "defaultValue": "westus2"
+      },
+      "appServicePlanSkuName": {
+        "type": "string",
+        "defaultValue": "S1",
+        "metadata": {
+          "description": "Describes plan's pricing tier and capacity. Check details at https://azure.microsoft.com/en-us/pricing/details/app-service/"
+        }
+      },
+      "aspnetcoreVersion":{
+        "type": "string",
+        "defaultValue": "2.1.0-preview1-final"
+      }
+    },
+    "variables": {
+
+        "resourceNamePrefix" : "crweb",
+
+        "urlPrefix" : "https://",
+
+        "urlSuffix" : ".azurewebsites.net",
+
+        "functionAppProxyUrl" : "[concat(variables('urlPrefix'), parameters('functionAppProxyName'), variables('urlSuffix'))]",
+
+        "appServicePlanName":"[concat(variables('resourceNamePrefix'), 'app', parameters('uniqueResourceNameSuffix'))]",
+
+        "appServiceName": "[concat(variables('resourceNamePrefix'), parameters('uniqueResourceNameSuffix'))]",
+
+        "appHostingPlanNameVar": "[concat(variables('appServicePlanName'),'-apps')]",
+
+        "applicationInsightsName": "[concat(variables('appServiceName'), 'ai')]"
+
+     },
+    "resources": [
+      {
+        "name": "[variables('appHostingPlanNameVar')]",
+        "type": "Microsoft.Web/serverfarms",
+        "location": "[resourceGroup().location]",
+        "apiVersion": "2015-08-01",
+        "sku": {
+          "name": "[parameters('appServicePlanSkuName')]"
+        },
+        "dependsOn": [ ],
+        "tags": {
+          "displayName": "appServicePlan"
+        },
+        "properties": {
+          "name": "[variables('appHostingPlanNameVar')]",
+          "numberOfWorkers": 1
+        }
+      },
+      {
+        "name": "[variables('appServiceName')]",
+        "type": "Microsoft.Web/sites",
+        "location": "[resourceGroup().location]",
+        "apiVersion": "2015-08-01",
+        "resources": [
+            {
+                "name": "web",
+                "type": "config",
+                "apiVersion": "2015-08-01",
+                "properties": {
+                    "webSocketsEnabled": true
+                },
+                "dependsOn": [
+                    "[resourceId('Microsoft.Web/sites', variables('appServiceName'))]"
+                ]
+            },
+            {
+                "name": "appsettings",
+                "type": "config",
+                "apiVersion": "2015-08-01",
+                "dependsOn": [
+                    "[resourceId('Microsoft.Web/sites', variables('appServiceName'))]"
+                ],
+                "tags": {
+                    "displayName": "WebAppSettings"
+                },
+                "properties": {
+                    "FUNCTION_API_PROXY_ROOT": "[variables('functionAppProxyUrl')]",
+                    "WEBSITE_NODE_DEFAULT_VERSION" : "6.9.1"
+                }
+            },
+            {
+              "type": "siteextensions",
+              "name": "AspNetCoreRuntime",
+              "apiVersion": "2016-08-01",
+              "location": "[resourceGroup().location]",
+              "properties": {
+                  "version": "[parameters('aspnetcoreVersion')]"
+              },
+              "dependsOn": [
+                  "[resourceId('Microsoft.Web/sites', variables('appServiceName'))]"
+              ]
+            }
+        ],
+        "tags": {
+          "[concat('hidden-related:', resourceId('Microsoft.Web/serverfarms', variables('appHostingPlanNameVar')))]": "Resource",
+          "displayName": "webApp"
+        },
+        "properties": {
+          "name": "[variables('appServiceName')]",
+          "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('appHostingPlanNameVar'))]"
+        },
+        "dependsOn": [
+            "[resourceId('Microsoft.Web/serverfarms', variables('appHostingPlanNameVar'))]"
+        ]
+      }
+     ],
+    "outputs": {}
+  }

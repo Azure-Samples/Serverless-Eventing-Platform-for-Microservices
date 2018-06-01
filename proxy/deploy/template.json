@@ -1,0 +1,92 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "uniqueResourceNameSuffix": {
+            "type": "string",
+            "defaultValue": "[uniqueString(subscription().subscriptionId, resourceGroup().id)]"
+        },
+
+        "categoriesMicroserviceApiAppName": {
+            "type": "string"
+        },
+        "imagesMicroserviceApiAppName": {
+            "type": "string"
+        },
+        "audioMicroserviceApiAppName": {
+            "type": "string"
+        },
+        "textMicroserviceApiAppName": {
+            "type": "string"
+        }
+    },
+    "variables": {
+        "resourceNamePrefix": "crapi",
+
+        "functionsAppServicePlanName": "[concat(variables('resourceNamePrefix'), 'fnasp', parameters('uniqueResourceNameSuffix'))]",
+        "functionsApiProxyAppName": "[concat(variables('resourceNamePrefix'), 'proxy', parameters('uniqueResourceNameSuffix'))]"
+    },
+    "resources": [
+        {
+            "name": "[variables('functionsAppServicePlanName')]",
+            "type": "Microsoft.Web/serverfarms",
+            "location": "[resourceGroup().location]",
+            "apiVersion": "2016-09-01",
+            "sku": {
+                "name": "Y1",
+                "tier": "Dynamic",
+                "size": "Y1",
+                "family": "Y",
+                "capacity": 0
+            },
+            "kind": "functionapp",
+            "properties": {
+                "workerTierName": null,
+                "adminSiteName": null,
+                "hostingEnvironmentProfile": null,
+                "perSiteScaling": false,
+                "reserved": false,
+                "targetWorkerCount": 0,
+                "targetWorkerSizeId": 0
+            }
+        },
+        {
+            "name": "[variables('functionsApiProxyAppName')]",
+            "type": "Microsoft.Web/sites",
+            "location": "[resourceGroup().location]",
+            "apiVersion": "2015-08-01",
+            "kind": "functionapp",
+            "properties": {
+                "enabled": true,
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('functionsAppServicePlanName'))]",
+                "reserved": false
+            },
+            "resources": [
+                {
+                    "name": "appsettings",
+                    "type": "config",
+                    "apiVersion": "2015-08-01",
+                    "properties": {
+                        "ROUTING_EXTENSION_VERSION": "~0.2",
+                        "CategoriesMicroserviceApiAppName": "[parameters('categoriesMicroserviceApiAppName')]",
+                        "ImagesMicroserviceApiAppName": "[parameters('imagesMicroserviceApiAppName')]",
+                        "AudioMicroserviceApiAppName": "[parameters('audioMicroserviceApiAppName')]",
+                        "TextMicroserviceApiAppName": "[parameters('textMicroserviceApiAppName')]"
+                    },
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Web/sites', variables('functionsApiProxyAppName'))]"
+                    ]
+                }
+            ],
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/serverfarms', variables('functionsAppServicePlanName'))]"
+            ]
+        }
+    ],
+    "outputs": {
+        "functionsApiProxyHostName": {
+            "type": "string",
+            "value": "[reference(variables('functionsApiProxyAppName')).hostNames[0]]"
+        }
+    }
+}

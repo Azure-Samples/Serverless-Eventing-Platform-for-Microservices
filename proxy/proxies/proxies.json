@@ -1,0 +1,61 @@
+{
+    "$schema": "http://json.schemastore.org/proxies",
+    "proxies": {
+        "categories": {
+            "matchCondition": {
+                "methods": [ "GET", "POST" ],
+                "route": "/categories"
+            },
+            "backendUri": "https://%CategoriesMicroserviceApiAppName%.azurewebsites.net/api/categories"
+        },
+        "categoriesSingle": {
+            "matchCondition": {
+                "methods": [ "GET", "PATCH", "DELETE" ],
+                "route": "/categories/{categoryId}"
+            },
+            "backendUri": "https://%CategoriesMicroserviceApiAppName%.azurewebsites.net/api/categories/{categoryId}"
+        },
+        "audio": {
+            "matchCondition": {
+                "methods": [ "GET", "POST" ],
+                "route": "/audio"
+            },
+            "backendUri": "https://%AudioMicroserviceApiAppName%.azurewebsites.net/api/audio"
+        },
+        "audioSingle": {
+            "matchCondition": {
+                "methods": [ "GET", "POST", "DELETE" ],
+                "route": "/audio/{audioId}"
+            },
+            "backendUri": "https://%AudioMicroserviceApiAppName%.azurewebsites.net/api/audio/{audioId}"
+        },
+        "images": {
+            "matchCondition": {
+                "methods": [ "GET", "POST" ],
+                "route": "/images"
+            },
+            "backendUri": "https://%ImagesMicroserviceApiAppName%.azurewebsites.net/api/images"
+        },
+        "imageSingle": {
+            "matchCondition": {
+                "methods": [ "GET", "POST", "DELETE" ],
+                "route": "/images/{imageId}"
+            },
+            "backendUri": "https://%ImagesMicroserviceApiAppName%.azurewebsites.net/api/images/{imageId}"
+        },
+        "text": {
+            "matchCondition": {
+                "methods": [ "GET", "POST" ],
+                "route": "/text"
+            },
+            "backendUri": "https://%TextMicroserviceApiAppName%.azurewebsites.net/api/text"
+        },
+        "textSingle": {
+            "matchCondition": {
+                "methods": [ "GET", "PATCH", "DELETE" ],
+                "route": "/text/{textId}"
+            },
+            "backendUri": "https://%TextMicroserviceApiAppName%.azurewebsites.net/api/text/{textId}"
+        }
+    }
+}

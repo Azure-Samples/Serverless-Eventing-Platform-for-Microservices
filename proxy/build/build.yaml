@@ -1,0 +1,28 @@
+# Builds the ContentReactor API proxy resources
+
+name: $(BuildID)
+steps:
+
+  # Zip the `proxies` folder
+  - task: ArchiveFiles@2
+    displayName: Zip Proxy Configuration
+    inputs:
+      rootFolderOrFile: proxy/proxies
+      includeRootFolder: false
+      archiveFile: $(Build.ArtifactStagingDirectory)/proxies.zip
+
+  # Publish the zipped `proxies` folder as an artifact
+  - task: PublishBuildArtifacts@1
+    displayName: Publish Proxy Configuration
+    inputs:
+      PathtoPublish: $(Build.ArtifactStagingDirectory)/proxies.zip
+      ArtifactName: proxies
+      publishLocation: Container
+
+  # Publish the 'deploy` folder as an artifact
+  - task: PublishBuildArtifacts@1
+    displayName: Publish Deployment Scripts
+    inputs:
+      PathtoPublish: proxy/deploy
+      ArtifactName: deploy
+      publishLocation: Container

@@ -1,0 +1,46 @@
+# Builds the ContentReactor Front end and ASP.NET SignalR Middleware
+
+resources:
+- repo: self
+queue:
+  name: ContentReactor-Web-CI
+  demands: 
+  - npm
+  - msbuild
+
+steps:
+
+# Build Angular App
+- task: Npm@1
+  inputs:
+    workingDir: 'web/src/signalr-web/SignalRMiddleware/EventApp'
+    verbose: false
+
+# Build the SignalR ASP.NET WebApp
+- task: DotNetCoreCLI@2
+  inputs:
+    command: restore
+    projects: 'web/src/signalr-web/SignalRMiddleware/SignalRMiddleware.sln'
+
+# Package Angular App and SignalR App as one artifact
+- task: MSBuild@1
+  inputs:
+    solution: 'web/src/signalr-web/SignalRMiddleware/SignalRMiddleware.sln'
+    msbuildArguments: '/p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true /p:SkipInvalidConfigurations=true /p:PackageLocation="$(build.artifactstagingdirectory)\\"'
+    clean: true
+    restoreNugetPackages: true
+
+# Drop build artifact into staging directory for release
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: '$(build.artifactstagingdirectory)'
+    artifactName: webapp
+    artifactType: container
+
+# Publish deploy artifacts into staging directory for release
+- task: PublishBuildArtifacts@1
+  displayName: Publish Deployment Scripts
+  inputs:
+    pathToPublish: web/deploy
+    artifactName: deploy
+    artifactType: container

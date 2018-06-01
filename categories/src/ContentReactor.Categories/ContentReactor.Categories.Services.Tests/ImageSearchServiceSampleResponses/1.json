@@ -1,0 +1,91 @@
+{
+    "_type": "Images",
+    "instrumentation": {
+      "_type": "ResponseInstrumentation"
+    },
+    "readLink": "https://api.cognitive.microsoft.com/api/v7/images/search?q=cats",
+    "webSearchUrl": "https://www.bing.com/images/search?q=cats&FORM=OIIARP",
+    "totalEstimatedMatches": 972,
+    "nextOffset": 36,
+    "value": [
+      {
+        "webSearchUrl": "https://www.bing.com/images/search?view=detailv2&FORM=OIIRPO&q=cats&id=651D97D44901FEF86344539E0AC7760FA994A4A4&simid=608020161282510252",
+        "name": "Cats images Funny Cats HD wallpaper and background photos ...",
+        "thumbnailUrl": "https://tse2.mm.bing.net/th?id=OIP.8w9-Q6kW1lqblQDoUK847AHaFj&pid=Api",
+        "datePublished": "2013-01-26T05:33:00.0000000Z",
+        "contentUrl": "http://images2.fanpop.com/image/photos/9400000/Funny-Cats-cats-9473312-1600-1200.jpg",
+        "hostPageUrl": "http://www.fanpop.com/clubs/cats/images/9473312/title/funny-cats-wallpaper",
+        "contentSize": "237027 B",
+        "encodingFormat": "jpeg",
+        "hostPageDisplayUrl": "www.fanpop.com/clubs/cats/images/9473312/title/funny-cats-wallpaper",
+        "width": 1600,
+        "height": 1200,
+        "thumbnail": {
+          "width": 474,
+          "height": 355
+        },
+        "imageInsightsToken": "ccid_8w9+Q6kW*mid_651D97D44901FEF86344539E0AC7760FA994A4A4*simid_608020161282510252*thid_OIP.8w9-Q6kW1lqblQDoUK847AHaFj",
+        "insightsMetadata": {
+          "recipeSourcesCount": 0,
+          "bestRepresentativeQuery": {
+            "text": "Funny Cats and Kittens",
+            "displayText": "Funny Cats and Kittens",
+            "webSearchUrl": "https://www.bing.com/images/search?q=Funny+Cats+and+Kittens&id=651D97D44901FEF86344539E0AC7760FA994A4A4&FORM=IDBQDM"
+          },
+          "pagesIncludingCount": 38,
+          "availableSizesCount": 13
+        },
+        "imageId": "651D97D44901FEF86344539E0AC7760FA994A4A4",
+        "accentColor": "772526"
+      }
+    ],
+    "queryExpansions": [
+      {
+        "text": "Crazy Cat",
+        "displayText": "Crazy",
+        "webSearchUrl": "https://www.bing.com/images/search?q=Crazy+Cat&tq=%7b%22pq%22%3a%22cats%22%2c%22qs%22%3a%5b%7b%22cv%22%3a%22cats%22%2c%22pv%22%3a%22cats%22%2c%22hps%22%3atrue%2c%22iqp%22%3afalse%7d%2c%7b%22cv%22%3a%22Crazy%22%2c%22pv%22%3a%22%22%2c%22hps%22%3afalse%2c%22iqp%22%3atrue%7d%5d%7d&FORM=IRPATC",
+        "searchLink": "https://api.cognitive.microsoft.com/api/v7/images/search?q=Crazy+Cat&tq=%7b%22pq%22%3a%22cats%22%2c%22qs%22%3a%5b%7b%22cv%22%3a%22cats%22%2c%22pv%22%3a%22cats%22%2c%22hps%22%3atrue%2c%22iqp%22%3afalse%7d%2c%7b%22cv%22%3a%22Crazy%22%2c%22pv%22%3a%22%22%2c%22hps%22%3afalse%2c%22iqp%22%3atrue%7d%5d%7d",
+        "thumbnail": {
+          "thumbnailUrl": "https://tse2.mm.bing.net/th?q=Crazy+Cat&pid=Api&mkt=en-NZ&adlt=moderate&t=1"
+        }
+      }
+    ],
+    "pivotSuggestions": [
+      {
+        "pivot": "cats",
+        "suggestions": [
+          {
+            "text": "Felidae",
+            "displayText": "Felidae",
+            "webSearchUrl": "https://www.bing.com/images/search?q=Felidae&tq=%7b%22pq%22%3a%22cats%22%2c%22qs%22%3a%5b%7b%22cv%22%3a%22cats%22%2c%22pv%22%3a%22cats%22%2c%22hps%22%3atrue%2c%22iqp%22%3afalse%7d%2c%7b%22cv%22%3a%22Felidae%22%2c%22pv%22%3a%22%22%2c%22hps%22%3afalse%2c%22iqp%22%3atrue%7d%5d%7d&FORM=IRQBPS",
+            "searchLink": "https://api.cognitive.microsoft.com/api/v7/images/search?q=Felidae&tq=%7b%22pq%22%3a%22cats%22%2c%22qs%22%3a%5b%7b%22cv%22%3a%22cats%22%2c%22pv%22%3a%22cats%22%2c%22hps%22%3atrue%2c%22iqp%22%3afalse%7d%2c%7b%22cv%22%3a%22Felidae%22%2c%22pv%22%3a%22%22%2c%22hps%22%3afalse%2c%22iqp%22%3atrue%7d%5d%7d",
+            "thumbnail": {
+              "thumbnailUrl": "https://tse3.mm.bing.net/th?q=Felidae&pid=Api&mkt=en-NZ&adlt=moderate&t=1"
+            }
+          }
+        ]
+      }
+    ],
+    "similarTerms": [
+      {
+        "text": "kittens",
+        "displayText": "kittens",
+        "webSearchUrl": "https://www.bing.com/images/search?q=kittens&FORM=IDINTS",
+        "thumbnail": {
+          "url": "https://tse3.mm.bing.net/th?q=kittens&pid=Api&mkt=en-NZ&adlt=moderate"
+        }
+      }
+    ],
+    "relatedSearches": [
+      {
+        "text": "Funny Cats",
+        "displayText": "Funny Cats",
+        "webSearchUrl": "https://www.bing.com/images/search?q=Funny+Cats&FORM=IRPATC",
+        "searchLink": "https://api.cognitive.microsoft.com/api/v7/images/search?q=Funny+Cats",
+        "thumbnail": {
+          "thumbnailUrl": "https://tse2.mm.bing.net/th?q=Funny+Cats&pid=Api&mkt=en-NZ&adlt=moderate&t=1"
+        }
+      }
+    ]
+  }
+  

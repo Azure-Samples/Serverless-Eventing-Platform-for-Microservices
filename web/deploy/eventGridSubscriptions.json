@@ -1,0 +1,81 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "eventGridTopicName": {
+            "type": "string"
+        },
+
+        "appServiceName": {
+            "type": "string"
+        }
+    },
+    "variables": {
+        
+        "eventGridFunctionSubscriptions": [
+            {
+                "resourceName": "signalRCategoryNotifications", 
+                "webHookUrl" : "[concat('https://',parameters('appServiceName'), '.azurewebsites.net','/api/CategoryNotification')]",
+                "eventTypes": [
+                    "CategorySynonymsUpdated",
+                    "CategoryImageUpdated",
+                    "CategoryItemsUpdated",
+                    "CategoryNameUpdated",
+                    "CategoryCreated",
+                    "CategoryDeleted"
+                ]
+            },
+            {
+                "resourceName": "signalRImageNotifications",
+                "webHookUrl" : "[concat('https://',parameters('appServiceName'), '.azurewebsites.net','/api/ImageNotification')]",
+                "eventTypes": [
+                    "ImageCaptionUpdated",
+                    "ImageCreated",
+                    "ImageDeleted"
+                ]
+            },
+            {
+                "resourceName": "signalRAudioNotifications",
+                "webHookUrl" : "[concat('https://',parameters('appServiceName'), '.azurewebsites.net','/api/AudioNotification')]",
+                "eventTypes": [
+                    "AudioTranscriptUpdated",
+                    "AudioCreated",
+                    "AudioDeleted"
+                ]
+            },
+            {
+                "resourceName": "signalRTextNotifications",
+                "webHookUrl" : "[concat('https://',parameters('appServiceName'), '.azurewebsites.net','/api/TextNotification')]",
+                "eventTypes": [
+                    "TextCreated",
+                    "TextDeleted",
+                    "TextUpdated"
+                ]
+            }
+        ]
+    },
+    "resources": [
+        {
+            "name": "[concat(parameters('eventGridTopicName'), '/Microsoft.EventGrid/', variables('eventGridFunctionSubscriptions')[copyIndex('eventGridFunctionSubscriptions')].resourceName)]",
+            "copy": {
+                "name": "eventGridFunctionSubscriptions",
+                "count": "[length(variables('eventGridFunctionSubscriptions'))]",
+                "mode": "Parallel"
+            },
+            "type": "Microsoft.EventGrid/topics/providers/eventSubscriptions",
+            "location": "[resourceGroup().location]",
+            "apiVersion": "2018-01-01",
+            "properties": {
+                "destination": {
+                    "endpointType": "WebHook",
+                    "properties": {
+                        "endpointUrl": "[variables('eventGridFunctionSubscriptions')[copyIndex('eventGridFunctionSubscriptions')].webHookUrl]"
+                    }
+                },
+                "filter": {
+                    "includedEventTypes": "[variables('eventGridFunctionSubscriptions')[copyIndex('eventGridFunctionSubscriptions')].eventTypes]"
+                }
+            }
+        }
+    ]
+}
