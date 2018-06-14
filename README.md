@@ -176,7 +176,6 @@ Integrating Content Reactor with Azure AD B2C is conceptually similar to working
  4. Set up each microservice's front-end API Functions app to check for authorization. [This blog post provides specific instructions on using Azure AD B2C with Azure Functions.](https://blogs.msdn.microsoft.com/hmahrt/2017/03/07/azure-active-directory-b2c-and-azure-functions/)
  5. Update each microservice's front-end API Functions app to use the subject ID or a user ID claim as the user ID within the Content Reactor system, and remove the `userId` query string parameter from each API operation.
 
-
 ## Event Types Reference
 
 | Event Type              | Publisher               | Published When                                                                                                                                         | Microservice Subscribers                                                                                                                    |
@@ -356,7 +355,7 @@ Should return an HTTP 204 No Content.
 #### Create Text Note
 
 ``` curl
-POST https://crprodapiproxy.azurewebsites.net/text?userId={userId} HTTP/1.1 
+POST https://crprodapiproxy.azurewebsites.net/text?userId={userId} HTTP/1.1
 
 {
   "text": "{text}",
@@ -434,7 +433,7 @@ Here are some sample screenshots from the front end that covers all scenarios an
 
 ![Screen 6](/_docs/screens/screen6.png)
 
-#### Image Caption Updated through Event Grid notification 
+#### Image Caption Updated through Event Grid notification
 
 ![Screen 7](/_docs/screens/screen7.png)
 

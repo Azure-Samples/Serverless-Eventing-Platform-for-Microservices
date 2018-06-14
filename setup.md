@@ -96,7 +96,7 @@ To deploy Content Reactor into your own Azure subscription, you will need to ens
  3. Deploy the proxy.
  4. Deploy the web front-end.
 
-The sample includes ARM templates for each component. Each ARM template contains a `uniqueResourceNameSuffix` parameter that must be set to a globally unique value. The instructions for VSTS below include creating a globablly unique value. When manually deploying the components, if you do not specify your own suffix then the ARM template will create a 13-character random string and use that.
+The sample includes ARM templates for each component. Each ARM template contains a `uniqueResourceNameSuffix` parameter that must be set to a globally unique value. The instructions for VSTS below include creating a globablly unique value. When manually deploying the components, if you do not specify your own suffix then the ARM template will create a 13-character random string and use that. More information around practices on how to deploy this as a set of Microservices can be found at the [Microservices Example](microservices.md)
 
 ## Deploying Event Grid Topic
 
