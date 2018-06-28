@@ -1,13 +1,18 @@
  #!/bin/bash
 
 echo "Checking for prerequisites..."
-if ! which npm > /dev/null; then
+if ! type npm > /dev/null; then
     echo "Prerequisite Check 1: Install Node.js and NPM"
     exit 1
 fi
 
-if ! dotnet --list-sdks > /dev/null; then
+if ! type dotnet --list-sdks > /dev/null; then
     echo "Prerequisite Check 2: Install .NET Core 2.1 SDK or Runtime"
+    exit 1
+fi
+
+if ! type zip > /dev/null; then
+    echo "Prerequisite Check 3: Install zip"
     exit 1
 fi
 
