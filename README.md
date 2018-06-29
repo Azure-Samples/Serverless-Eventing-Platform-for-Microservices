@@ -1,5 +1,5 @@
 ---
-services: functions,  event-grid cosmos-db
+services: functions, event-grid, cosmos-db
 platforms: dotnet
 author: nzthiago
 ---
