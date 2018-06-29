@@ -14,14 +14,6 @@ echo "Provide subscription ID: "
 read subscriptionId
 az account set --subscription $subscriptionId 
 
-#az group create -n ContentReactor-Audio -l westus2
-#az group create -n ContentReactor-Categories -l westus2
-#az group create -n ContentReactor-Events -l westus2
-#az group create -n ContentReactor-Images -l westus2
-#az group create -n ContentReactor-Proxy -l westus2
-#az group create -n ContentReactor-Text -l westus2
-#az group create -n ContentReactor-Web -l westus2
-
 HOME=`pwd`
 echo "Provide an unique suffix string (recommended to autogenerate string to guarantee uniqueness): "
 read uniqueSuffixString
@@ -125,6 +117,7 @@ az group deployment create -g ContentReactor-Events --template-file $HOME/audio/
 
 echo "Starting deploy of Text Microservice..."
 az account set --subscription $subscriptionId 
+az group create -n ContentReactor-Text -l westus2
 az group deployment create -g ContentReactor-Text --template-file $HOME/text/deploy/microservice.json --parameters eventGridTopicName=$EVENT_GRID_TOPIC_NAME --mode Complete
 
 echo "Creating Text Blob Storage..."
@@ -141,6 +134,7 @@ az webapp deployment source config-zip --resource-group ContentReactor-Text --na
 # Deploy Proxy
 echo "Starting deploy of Proxy..."
 az account set --subscription $subscriptionId 
+az group create -n ContentReactor-Proxy -l westus2
 az group deployment create -g ContentReactor-Proxy --template-file $HOME/proxy/deploy/template.json --parameters categoriesMicroserviceApiAppName=$CATEGORIES_API_NAME imagesMicroserviceApiAppName=$IMAGES_API_NAME audioMicroserviceApiAppName=$AUDIO_API_NAME textMicroserviceApiAppName=$TEXT_API_NAME --mode Complete
 PROXY_API_NAME=crapiproxy$uniqueSuffixString
 az webapp deployment source config-zip --resource-group ContentReactor-Proxies --name $PROXY_API_NAME --src $HOME/proxy/proxies/proxies.zip
@@ -148,6 +142,7 @@ az webapp deployment source config-zip --resource-group ContentReactor-Proxies -
 # Deploy Web 
 echo "Starting deploy of Web..."
 az account set --subscription $subscriptionId 
+az group create -n ContentReactor-Web -l westus2
 az group deployment create --name ContentReactorWeb-Deployment --resource-group ContentReactor-Web --template-file $HOME/web/deploy/template.json --parameters uniqueResourceNameSuffix=$uniqueSuffixString functionAppProxyName=crapiproxy$uniqueSuffixString
 WEB_APP_NAME=crweb$uniqueSuffixString
 az webapp deployment source config-zip --resource-group ContentReactor-Web --name $WEB_APP_NAME --src $HOME/web/src/signalr-web/SignalRMiddleware/SignalRMiddleware/obj/Release/netcoreapp2.1/SignalRMiddleware.dll
