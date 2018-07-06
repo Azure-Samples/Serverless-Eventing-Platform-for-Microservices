@@ -78,5 +78,11 @@ npm install
 npm run ubuntu-dev-build
 cd $HOME/web/src/signalr-web/SignalRMiddleware/
 dotnet build
+cd $HOME/web/src/signalr-web/SignalRMiddleware/SignalRMiddlewareTests/
 dotnet test
 dotnet publish -c Release
+
+cd $HOME/web/src/signalr-web/SignalRMiddleware/SignalRMiddleware/bin/Release/netcoreapp2.1/publish/
+zip -r SignalRMiddleware.zip .
+
+echo "Build successfully completed!"

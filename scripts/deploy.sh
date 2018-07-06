@@ -66,7 +66,7 @@ az storage container create --account-name $IMAGES_BLOB_STORAGE_ACCOUNT_NAME --n
 
 echo "Creating CORS Policy for Blob Storage"
 az storage cors clear --account-name $IMAGES_BLOB_STORAGE_ACCOUNT_NAME --services b
-az storage cors add --account-name $IMAGES_BLOB_STORAGE_ACCOUNT_NAME --services b --methods POST GET PUT --origins * --allowed-headers * --exposed-headers *
+az storage cors add --account-name $IMAGES_BLOB_STORAGE_ACCOUNT_NAME --services b --methods POST GET PUT --origins "*" --allowed-headers "*" --exposed-headers "*"
 
 echo "Deploying Images Functions..."
 az webapp deployment source config-zip --resource-group ContentReactor-Images --name  $IMAGES_API_NAME --src $HOME/images/src/ContentReactor.Images/ContentReactor.Images.Api/bin/Release/netstandard2.0/ContentReactor.Images.Api.zip
@@ -91,7 +91,7 @@ az storage container create --account-name $AUDIO_BLOB_STORAGE_ACCOUNT_NAME --na
 
 echo "Creating CORS Policy for Blob Storage"
 az storage cors clear --account-name $AUDIO_BLOB_STORAGE_ACCOUNT_NAME --services b
-az storage cors add --account-name $AUDIO_BLOB_STORAGE_ACCOUNT_NAME --services b --methods POST GET PUT --origins * --allowed-headers * --exposed-headers *
+az storage cors add --account-name $AUDIO_BLOB_STORAGE_ACCOUNT_NAME --services b --methods POST GET PUT --origins "*" --allowed-headers "*" --exposed-headers "*"
 
 echo "Deploying Audio Functions..."
 az webapp deployment source config-zip --resource-group ContentReactor-Audio --name $AUDIO_API_NAME --src $HOME/audio/src/ContentReactor.Audio/ContentReactor.Audio.Api/bin/Release/netstandard2.0/ContentReactor.Audio.Api.zip
@@ -129,5 +129,7 @@ az group create -n ContentReactor-Web -l westus2
 az group deployment create --name ContentReactorWeb-Deployment --resource-group ContentReactor-Web --template-file $HOME/web/deploy/template.json --parameters uniqueResourceNameSuffix=$uniqueSuffixString functionAppProxyName=crapiproxy$uniqueSuffixString
 WEB_APP_NAME=crweb$uniqueSuffixString
 
+webInstrumentationKey=$(az resource show --namespace microsoft.insights --resource-type components --name $WEB_APP_NAME-ai -g ContentReactor-Web --query properties.InstrumentationKey)
+sed -i -e 's/\"%INSTRUMENTATION_KEY%\"/'"$webInstrumentationKey"'/g' $HOME/web/src/signalr-web/SignalRMiddleware/EventApp/src/environments/environment.ts
 az webapp deployment source config-zip --resource-group ContentReactor-Web --name $WEB_APP_NAME --src $HOME/web/src/signalr-web/SignalRMiddleware/SignalRMiddleware/bin/Release/netcoreapp2.1/publish/SignalRMiddleware.zip
 az group deployment create -g ContentReactor-Events --template-file $HOME/web/deploy/eventGridSubscriptions.json --parameters eventGridTopicName=c$EVENT_GRID_TOPIC_NAME appServiceName=$WEB_APP_NAME

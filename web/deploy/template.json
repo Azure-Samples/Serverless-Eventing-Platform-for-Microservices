@@ -2,7 +2,6 @@
     "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-
       "uniqueResourceNameSuffix": {
         "type": "string",
         "defaultValue": "[uniqueString(subscription().subscriptionId, resourceGroup().id)]"
@@ -20,10 +19,6 @@
         "metadata": {
           "description": "Describes plan's pricing tier and capacity. Check details at https://azure.microsoft.com/en-us/pricing/details/app-service/"
         }
-      },
-      "aspnetcoreVersion":{
-        "type": "string",
-        "defaultValue": "2.1.0-preview1-final"
       }
     },
     "variables": {
@@ -42,10 +37,20 @@
 
         "appHostingPlanNameVar": "[concat(variables('appServicePlanName'),'-apps')]",
 
-        "applicationInsightsName": "[concat(variables('appServiceName'), 'ai')]"
+        "applicationInsightsName": "[concat(variables('appServiceName'), '-ai')]"
 
      },
     "resources": [
+      {
+        "name": "[variables('applicationInsightsName')]",
+        "type": "Microsoft.Insights/components",
+        "apiVersion": "2014-04-01",
+        "location": "[parameters('applicationInsightsLocation')]",
+        "kind": "other",
+        "properties": {
+            "applicationId": "[variables('applicationInsightsName')]"
+        }
+      },
       {
         "name": "[variables('appHostingPlanNameVar')]",
         "type": "Microsoft.Web/serverfarms",
