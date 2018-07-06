@@ -86,15 +86,15 @@ AUDIO_API_NAME=craudapi$uniqueSuffixString
 AUDIO_WORKER_API_NAME=craudwapi$uniqueSuffixString
 
 echo "Creating Audio Blob Storage..."
-=AUDIO_BLOB_STORAGE_ACCOUNT_NAME=craudblob$uniqueSuffixString
+AUDIO_BLOB_STORAGE_ACCOUNT_NAME=craudblob$uniqueSuffixString
 az storage container create --account-name $AUDIO_BLOB_STORAGE_ACCOUNT_NAME --name audio
 
 echo "Creating CORS Policy for Blob Storage"
-=az storage cors clear --account-name $AUDIO_BLOB_STORAGE_ACCOUNT_NAME --services b
+az storage cors clear --account-name $AUDIO_BLOB_STORAGE_ACCOUNT_NAME --services b
 az storage cors add --account-name $AUDIO_BLOB_STORAGE_ACCOUNT_NAME --services b --methods POST GET PUT --origins * --allowed-headers * --exposed-headers *
 
 echo "Deploying Audio Functions..."
-=az webapp deployment source config-zip --resource-group ContentReactor-Audio --name $AUDIO_API_NAME --src $HOME/audio/src/ContentReactor.Audio/ContentReactor.Audio.Api/bin/Release/netstandard2.0/ContentReactor.Audio.Api.zip
+az webapp deployment source config-zip --resource-group ContentReactor-Audio --name $AUDIO_API_NAME --src $HOME/audio/src/ContentReactor.Audio/ContentReactor.Audio.Api/bin/Release/netstandard2.0/ContentReactor.Audio.Api.zip
 az webapp deployment source config-zip --resource-group ContentReactor-Audio --name $AUDIO_WORKER_API_NAME --src $HOME/audio/src/ContentReactor.Audio/ContentReactor.Audio.WorkerApi/bin/Release/netstandard2.0/ContentReactor.Audio.WorkerApi.zip
 
 echo "Deploying Event Grid Subscription for Audio"
@@ -123,10 +123,11 @@ PROXY_API_NAME=crapiproxy$uniqueSuffixString
 az webapp deployment source config-zip --resource-group ContentReactor-Proxy --name $PROXY_API_NAME --src $HOME/proxy/proxies/proxies.zip
 
 # Deploy Web 
-#cho "Starting deploy of Web..."
-#az group create -n ContentReactor-Web -l westus2
+echo "Starting deploy of Web..."
+az group create -n ContentReactor-Web -l westus2
 
-#az group deployment create --name ContentReactorWeb-Deployment --resource-group ContentReactor-Web --template-file $HOME/web/deploy/template.json --parameters uniqueResourceNameSuffix=$uniqueSuffixString functionAppProxyName=crapiproxy$uniqueSuffixString
-#WEB_APP_NAME=crweb$uniqueSuffixString
+az group deployment create --name ContentReactorWeb-Deployment --resource-group ContentReactor-Web --template-file $HOME/web/deploy/template.json --parameters uniqueResourceNameSuffix=$uniqueSuffixString functionAppProxyName=crapiproxy$uniqueSuffixString
+WEB_APP_NAME=crweb$uniqueSuffixString
 
-#az webapp deployment source config-zip --resource-group ContentReactor-Web --name $WEB_APP_NAME --src $HOME/web/src/signalr-web/SignalRMiddleware/SignalRMiddleware/obj/Release/netcoreapp2.1/SignalRMiddleware.dll
+az webapp deployment source config-zip --resource-group ContentReactor-Web --name $WEB_APP_NAME --src $HOME/web/src/signalr-web/SignalRMiddleware/SignalRMiddleware/bin/Release/netcoreapp2.1/publish/SignalRMiddleware.zip
+az group deployment create -g ContentReactor-Events --template-file $HOME/web/deploy/eventGridSubscriptions.json --parameters eventGridTopicName=c$EVENT_GRID_TOPIC_NAME appServiceName=$WEB_APP_NAME

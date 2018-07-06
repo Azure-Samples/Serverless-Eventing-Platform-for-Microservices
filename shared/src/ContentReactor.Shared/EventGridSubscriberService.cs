@@ -41,7 +41,7 @@ namespace ContentReactor.Shared
             
             foreach (var dataEvent in data)
             {
-                if (req.Headers.Contains(new KeyValuePair<string, StringValues>(EventGridSubscriptionValidationHeaderKey, "SubscriptionValidation")) &&
+                if (req.Headers.TryGetValue(EventGridSubscriptionValidationHeaderKey, out StringValues values) && values.Equals("SubscriptionValidation") &&
                     dataEvent.eventType == "Microsoft.EventGrid.SubscriptionValidationEvent")
                 {
                     // this is a special event type that needs an echo response for Event Grid to work

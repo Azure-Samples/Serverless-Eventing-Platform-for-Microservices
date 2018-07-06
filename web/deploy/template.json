@@ -94,18 +94,6 @@
                     "FUNCTION_API_PROXY_ROOT": "[variables('functionAppProxyUrl')]",
                     "WEBSITE_NODE_DEFAULT_VERSION" : "6.9.1"
                 }
-            },
-            {
-              "type": "siteextensions",
-              "name": "AspNetCoreRuntime",
-              "apiVersion": "2016-08-01",
-              "location": "[resourceGroup().location]",
-              "properties": {
-                  "version": "[parameters('aspnetcoreVersion')]"
-              },
-              "dependsOn": [
-                  "[resourceId('Microsoft.Web/sites', variables('appServiceName'))]"
-              ]
             }
         ],
         "tags": {

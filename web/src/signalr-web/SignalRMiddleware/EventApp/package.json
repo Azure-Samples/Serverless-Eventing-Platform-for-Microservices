@@ -11,8 +11,10 @@
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e",
-    "copy": "xcopy \"dist\"\\* \"..\\SignalRMiddleware\\wwwroot\" /i /s /r /y /c",
-    "dist": "npm run build && npm run copy"
+    "copy": "xcopy.exe \"dist\"\\* \"..\\SignalRMiddleware\\wwwroot\" /i /s /r /y /c",
+    "dist": "npm run build && npm run copy",
+    "ubuntu-dev-build": "npm run dev-build && npm run ubuntu-copy",
+    "ubuntu-copy": "cp -r dist/* ../SignalRMiddleware/wwwroot/"
   },
   "private": true,
   "dependencies": {

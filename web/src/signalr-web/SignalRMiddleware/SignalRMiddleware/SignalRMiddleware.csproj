@@ -27,7 +27,7 @@
     <Folder Include="wwwroot\" />
   </ItemGroup>
 
-  <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
+  <!--<Target Name="PreBuild" BeforeTargets="PreBuildEvent">
     <Exec Command="echo &quot;cd $(SolutionDir)EventApp&quot; &amp;&amp;^&#xD;&#xA;cd &quot;$(SolutionDir)EventApp&quot; &amp;&amp;^&#xD;&#xA;echo &quot;building EventApp&quot; &amp;&amp;^&#xD;&#xA;npm run dev &amp;&amp;^" />
   </Target>
   
@@ -37,6 +37,6 @@
         <FilesToDelete Include="$(ProjectDir)wwwroot\*.*" />
     </ItemGroup>
     <Delete Files="@(FilesToDelete)" />
-  </Target>
+  </Target>-->
 
 </Project>

@@ -1,7 +1,6 @@
 ﻿using System.IO;
 using System.Reflection;
 using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.Helpers;
 using SixLabors.Primitives;
 using Xunit;
 

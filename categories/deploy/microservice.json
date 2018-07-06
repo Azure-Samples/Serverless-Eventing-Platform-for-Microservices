@@ -98,7 +98,7 @@
                     "type": "config",
                     "apiVersion": "2014-11-01",
                     "properties": {
-                        "FUNCTIONS_EXTENSION_VERSION": "2.0.11651-alpha",
+                        "FUNCTIONS_EXTENSION_VERSION": "beta",
                         "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('Microsoft.Insights/components', variables('applicationInsightsName')), '2014-04-01').InstrumentationKey]",
                         "EventGridTopicEndpoint": "[reference(variables('eventGridTopicResourceId'), '2018-01-01').endpoint]",
                         "EventGridTopicKey": "[listKeys(variables('eventGridTopicResourceId'), '2018-01-01').key1]",
@@ -142,7 +142,7 @@
                     "type": "config",
                     "apiVersion": "2014-11-01",
                     "properties": {
-                        "FUNCTIONS_EXTENSION_VERSION": "2.0.11651-alpha",
+                        "FUNCTIONS_EXTENSION_VERSION": "beta",
                         "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('Microsoft.Insights/components', variables('applicationInsightsName')), '2014-04-01').InstrumentationKey]",
                         "EventGridTopicEndpoint": "[reference(variables('eventGridTopicResourceId'), '2018-01-01').endpoint]",
                         "EventGridTopicKey": "[listKeys(variables('eventGridTopicResourceId'), '2018-01-01').key1]",

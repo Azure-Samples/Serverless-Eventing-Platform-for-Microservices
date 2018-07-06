@@ -24,9 +24,10 @@ echo "Building Categories Microservice..."
 HOME=`pwd`
 cd $HOME/categories/src/ContentReactor.Categories
 dotnet build
+cd $HOME/categories/src/ContentReactor.Categories/ContentReactor.Categories.Services.Tests
 dotnet test
+cd $HOME/categories/src/ContentReactor.Categories
 dotnet publish -c Release
-cd $HOME
 cd $HOME/categories/src/ContentReactor.Categories/ContentReactor.Categories.Api/bin/Release/netstandard2.0
 zip -r ContentReactor.Categories.Api.zip .
 cd $HOME/categories/src/ContentReactor.Categories/ContentReactor.Categories.WorkerApi/bin/Release/netstandard2.0
@@ -36,9 +37,10 @@ zip -r ContentReactor.Categories.WorkerApi.zip .
 echo "Building Images Microservice..."
 cd $HOME/images/src/ContentReactor.Images
 dotnet build
+cd $HOME/images/src/ContentReactor.Images/ContentReactor.Images.Services.Tests
 dotnet test
+cd $HOME/images/src/ContentReactor.Images
 dotnet publish -c Release
-cd $HOME
 cd $HOME/images/src/ContentReactor.Images/ContentReactor.Images.Api/bin/Release/netstandard2.0
 zip -r ContentReactor.Images.Api.zip .
 cd $HOME/images/src/ContentReactor.Images/ContentReactor.Images.WorkerApi/bin/Release/netstandard2.0
@@ -47,9 +49,10 @@ zip -r ContentReactor.Images.WorkerApi.zip .
 echo "Building Audio Microservice..."
 cd $HOME/audio/src/ContentReactor.Audio
 dotnet build
+cd $HOME/audio/src/ContentReactor.Audio/ContentReactor.Audio.Services.Tests
 dotnet test
+cd $HOME/audio/src/ContentReactor.Audio
 dotnet publish -c Release
-cd $HOME
 cd $HOME/audio/src/ContentReactor.Audio/ContentReactor.Audio.Api/bin/Release/netstandard2.0
 zip -r ContentReactor.Audio.Api.zip .
 cd $HOME/audio/src/ContentReactor.Audio/ContentReactor.Audio.WorkerApi/bin/Release/netstandard2.0
@@ -58,9 +61,22 @@ zip -r ContentReactor.Audio.WorkerApi.zip .
 echo "Building Text Microservice..."
 cd $HOME/text/src/ContentReactor.Text
 dotnet build
+cd $HOME/text/src/ContentReactor.Text/ContentReactor.Text.Services.Tests
 dotnet test
+cd $HOME/text/src/ContentReactor.Text
 dotnet publish -c Release
-cd $HOME
 cd $HOME/text/src/ContentReactor.Text/ContentReactor.Text.Api/bin/Release/netstandard2.0
 zip -r ContentReactor.Text.Api.zip .
 
+echo "Building proxy artifact..."
+cd $HOME/proxy/proxies
+zip -r proxies.zip .
+
+echo "Building Web..."
+cd $HOME/web/src/signalr-web/SignalRMiddleware/EventApp
+npm install
+npm run ubuntu-dev-build
+cd $HOME/web/src/signalr-web/SignalRMiddleware/
+dotnet build
+dotnet test
+dotnet publish -c Release
