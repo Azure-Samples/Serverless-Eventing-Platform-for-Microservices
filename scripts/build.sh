@@ -73,6 +73,7 @@ cd $HOME/proxy/proxies
 zip -r proxies.zip .
 
 echo "Building Web..."
+mkdir $HOME/web/src/signalr-web/SignalRMiddleware/SignalRMiddleware/wwwroot
 cd $HOME/web/src/signalr-web/SignalRMiddleware/EventApp
 npm install
 npm run ubuntu-dev-build
