@@ -6,11 +6,13 @@ The build.sh and deploy.sh scripts are meant to be run in Ubuntu WSL. Here are t
 2. Run fromdos command on both these scripts to convert them from dos to unix.
     
     sudo apt-get update
+    
     sudo apt-get install tofrodos
 
 3. The command 'which node' should point to a node installation in ubuntu (eg: /usr/bin/node)
 
     curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash –
+    
     sudo apt-get install -y nodejs
     
 4. The command 'which npm' should point to an npm installation in ubuntu (eg: /usr/bin/npm)
