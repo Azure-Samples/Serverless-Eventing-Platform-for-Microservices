@@ -18,6 +18,7 @@ The build.sh and deploy.sh scripts are meant to be run in Ubuntu WSL. Here are t
 6. Make sure dotnet cli is installed and points to version 2.1.x. See install instructions [here](https://www.microsoft.com/net/learn/get-started/linux/ubuntu16-04)
 7. Install latest [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli-apt?view=azure-cli-latest)
 8. [Create an Azure Service Principal](https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli?view=azure-cli-latest) with password for your subscription id and note down the following
+Note: Before creating a service principal, make sure you set your preferred subscription id through Azure CLI
     1. Service Principal App Id
     2. Service Principal App Password
     3. Tenant ID
