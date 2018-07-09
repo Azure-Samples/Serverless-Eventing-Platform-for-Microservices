@@ -11,7 +11,7 @@ The build.sh and deploy.sh scripts are meant to be run in Ubuntu WSL. Here are t
 
 3. The command 'which node' should point to a node installation in ubuntu (eg: /usr/bin/node)
 
-    curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash –
+    curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash
     
     sudo apt-get install -y nodejs
     
