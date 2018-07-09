@@ -80,7 +80,7 @@ az group deployment create -g ContentReactor-Events --template-file $HOME/images
 
 echo "Starting deploy of Audio Microservice..."
 az group create -n ContentReactor-Audio -l westus2
-az group deployment create -g ContentReactor-Audio --template-file $HOME/audio/deploy/microservice.json --parameters uniqueResourceNameSuffix=$uniqueSuffixString eventGridTopicName=$EVENT_GRID_TOPIC_NAME --mode Complete
+az group deployment create -g ContentReactor-Audio --template-file $HOME/audio/deploy/microservice.json --parameters uniqueResourceNameSuffix=$uniqueSuffixString eventsResourceGroupName=ContentReactor-Events eventGridTopicName=$EVENT_GRID_TOPIC_NAME --mode Complete
 
 AUDIO_API_NAME=craudapi$uniqueSuffixString
 AUDIO_WORKER_API_NAME=craudwapi$uniqueSuffixString
@@ -104,7 +104,7 @@ az group deployment create -g ContentReactor-Events --template-file $HOME/audio/
 
 echo "Starting deploy of Text Microservice..."
 az group create -n ContentReactor-Text -l westus2
-az group deployment create -g ContentReactor-Text --template-file $HOME/text/deploy/microservice.json --parameters uniqueResourceNameSuffix=$uniqueSuffixString eventGridTopicName=$EVENT_GRID_TOPIC_NAME --mode Complete
+az group deployment create -g ContentReactor-Text --template-file $HOME/text/deploy/microservice.json --parameters uniqueResourceNameSuffix=$uniqueSuffixString eventsResourceGroupName=ContentReactor-Events eventGridTopicName=$EVENT_GRID_TOPIC_NAME --mode Complete
 
 echo "Creating Text Blob Storage..."
 TEXT_BLOB_STORAGE_ACCOUNT_NAME=crtxtdb$uniqueSuffixString

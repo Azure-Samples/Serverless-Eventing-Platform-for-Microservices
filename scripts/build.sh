@@ -81,6 +81,7 @@ cd $HOME/web/src/signalr-web/SignalRMiddleware/
 dotnet build
 cd $HOME/web/src/signalr-web/SignalRMiddleware/SignalRMiddlewareTests/
 dotnet test
+cd $HOME/web/src/signalr-web/SignalRMiddleware/SignalRMiddleware
 dotnet publish -c Release
 
 cd $HOME/web/src/signalr-web/SignalRMiddleware/SignalRMiddleware/bin/Release/netcoreapp2.1/publish/
