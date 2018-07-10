@@ -3,7 +3,6 @@
 resources:
 - repo: self
 queue:
-  name: ContentReactor-Web-CI
   demands: 
   - npm
   - msbuild
