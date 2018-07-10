@@ -132,4 +132,4 @@ WEB_APP_NAME=crweb$uniqueSuffixString
 webInstrumentationKey=$(az resource show --namespace microsoft.insights --resource-type components --name $WEB_APP_NAME-ai -g ContentReactor-Web --query properties.InstrumentationKey)
 sed -i -e 's/\"%INSTRUMENTATION_KEY%\"/'"$webInstrumentationKey"'/g' $HOME/web/src/signalr-web/SignalRMiddleware/EventApp/src/environments/environment.ts
 az webapp deployment source config-zip --resource-group ContentReactor-Web --name $WEB_APP_NAME --src $HOME/web/src/signalr-web/SignalRMiddleware/SignalRMiddleware/bin/Release/netcoreapp2.1/publish/SignalRMiddleware.zip
-az group deployment create -g ContentReactor-Events --template-file $HOME/web/deploy/eventGridSubscriptions.json --parameters eventGridTopicName=c$EVENT_GRID_TOPIC_NAME appServiceName=$WEB_APP_NAME
+az group deployment create -g ContentReactor-Events --template-file $HOME/web/deploy/eventGridSubscriptions.json --parameters eventGridTopicName=$EVENT_GRID_TOPIC_NAME appServiceName=$WEB_APP_NAME
