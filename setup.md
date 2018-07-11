@@ -107,7 +107,7 @@ folder and name it `ContentReactor.Categories.WorkerApi.zip`.
 
 The front end and the signalR middleware is in the signalr-web/SignalRMiddleware folder. 
 This folder has a solution file which can be built using Visual Studio Version 15.7.0 
-Preview 2.0. The build takes care of building the angular component and bundling this 
+and above. The build takes care of building the angular component and bundling this 
 with the ASP.NET WebApp.
 
 Note: Please make sure that your build host or your local machine has the latest 
@@ -120,13 +120,14 @@ The instructions to install the preview locally can be found
 Build the ASP.NET Web Application using the following steps:
 
 1. Build the Angular app:
-    Go to web/src/signalr-web/SignalRMiddleware/EventApp and perform `npm install`
+    Go to web/src/signalr-web/SignalRMiddleware/EventApp 
+	and perform `npm install` followed by `npm run dev`
 
 2. Restore NuGet packages:
     `dotnet restore web/src/signalr-web/SignalRMiddleware/SignalRMiddleware.sln`
 
 3. Build MVC App: This will bundle Angular app and ASP.NET app using MSBuild
-    `msbuild.exe  web\src\signalr-web\SignalRMiddleware\SignalRMiddleware.sln`
+    `dotnet build  web\src\signalr-web\SignalRMiddleware\SignalRMiddleware.sln`
 
 4. Zip the contents of web\src\signalr-web\SignalRMiddleware\SignalRMiddleware\obj\Release\netcoreapp2.1
 
@@ -598,10 +599,6 @@ e.g. `$(System.DefaultWorkingDirectory)/web/deploy/eventGridSubscriptions.json`.
 Set the _Overridable template parameters_ to the following: 
 `uniqueResourceNamePrefix={event-grid-topic-name}`
 
-> Note: Since this is built on preview, template.json installs a Preview runtime. 
-> Re-deploying might cause conflicts because of this runtime. 
-> One way to resolve this is to delete and re-create the resource group for web 
-> with a different name.
 
 #### Deploying Web Application Manually
 
