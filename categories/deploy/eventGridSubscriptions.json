@@ -69,7 +69,7 @@
                 "destination": {
                     "endpointType": "WebHook",
                     "properties": {
-                        "endpointUrl": "[listsecrets(resourceId(concat(parameters('uniqueResourceNamePrefix'),'-categories'), 'Microsoft.Web/sites/functions', concat(parameters('uniqueResourceNamePrefix'),'-worker'), variables('eventGridFunctionSubscriptions')[copyIndex('eventGridFunctionSubscriptions')].functionName),'2015-08-01').trigger_url]"
+                        "endpointUrl": "[listsecrets(resourceId(concat(parameters('uniqueResourceNamePrefix'),'-categories'), 'Microsoft.Web/sites/functions', concat(parameters('uniqueResourceNamePrefix'),'-categories-worker'), variables('eventGridFunctionSubscriptions')[copyIndex('eventGridFunctionSubscriptions')].functionName),'2015-08-01').trigger_url]"
                     }
                 },
                 "filter": {

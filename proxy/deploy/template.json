@@ -2,29 +2,15 @@
     "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "uniqueResourceNameSuffix": {
-            "type": "string",
-            "defaultValue": "[uniqueString(subscription().subscriptionId, resourceGroup().id)]"
-        },
-
-        "categoriesMicroserviceApiAppName": {
-            "type": "string"
-        },
-        "imagesMicroserviceApiAppName": {
-            "type": "string"
-        },
-        "audioMicroserviceApiAppName": {
-            "type": "string"
-        },
-        "textMicroserviceApiAppName": {
+        "uniqueResourceNamePrefix": {
             "type": "string"
         }
     },
     "variables": {
-        "resourceNamePrefix": "crapi",
+        "resourceNamePrefix": "[concat(parameters('uniqueResourceNamePrefix'),'-proxy')]",
 
-        "functionsAppServicePlanName": "[concat(variables('resourceNamePrefix'), 'fnasp', parameters('uniqueResourceNameSuffix'))]",
-        "functionsApiProxyAppName": "[concat(variables('resourceNamePrefix'), 'proxy', parameters('uniqueResourceNameSuffix'))]"
+        "functionsAppServicePlanName": "[concat(variables('resourceNamePrefix'),'-asp')]",
+        "functionsApiProxyAppName": "[concat(variables('resourceNamePrefix'),'-api')]"
     },
     "resources": [
         {
@@ -68,10 +54,10 @@
                     "apiVersion": "2015-08-01",
                     "properties": {
                         "ROUTING_EXTENSION_VERSION": "~0.2",
-                        "CategoriesMicroserviceApiAppName": "[parameters('categoriesMicroserviceApiAppName')]",
-                        "ImagesMicroserviceApiAppName": "[parameters('imagesMicroserviceApiAppName')]",
-                        "AudioMicroserviceApiAppName": "[parameters('audioMicroserviceApiAppName')]",
-                        "TextMicroserviceApiAppName": "[parameters('textMicroserviceApiAppName')]"
+                        "CategoriesMicroserviceApiAppName": "[concat(parameters('uniqueResourceNamePrefix'),'-categories-api')]",
+                        "ImagesMicroserviceApiAppName": "[concat(parameters('uniqueResourceNamePrefix'),'-images-api')]",
+                        "AudioMicroserviceApiAppName": "[concat(parameters('uniqueResourceNamePrefix'),'-audio-api')]",
+                        "TextMicroserviceApiAppName": "[concat(parameters('uniqueResourceNamePrefix'),'-text-api')]"
                     },
                     "dependsOn": [
                         "[resourceId('Microsoft.Web/sites', variables('functionsApiProxyAppName'))]"
