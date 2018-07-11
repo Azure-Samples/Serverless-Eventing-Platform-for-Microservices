@@ -290,3 +290,11 @@ __pycache__/
 *.xsd.cs
 src/Web/content-reactor/wwwroot/dist/bundle.js
 /web/src/signalr-web/SignalRMiddleware/EventApp/.vscode/launch.json
+/.azure
+/.config/configstore
+/.dotnet
+/.node-gyp/8.11.3
+/.npm
+/.nuget/NuGet
+/proxy/proxies/proxies.zip
+/web/src/signalr-web/SignalRMiddleware/SignalRMiddleware/wwwroot
