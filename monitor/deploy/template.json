@@ -8,7 +8,7 @@
         }
     },
     "variables": {
-        "applicationInsightsName": "[concat(parameters('uniqueResourceNamePrefix'),'-ai')]"
+        "applicationInsightsName": "[concat(parameters('uniqueResourceNamePrefix'),'-monitor-ai')]"
     },
     "resources": [
         {

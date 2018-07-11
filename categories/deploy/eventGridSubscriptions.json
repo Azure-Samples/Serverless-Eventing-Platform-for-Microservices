@@ -8,7 +8,7 @@
 
     },
     "variables": {
-        "eventGridTopicName": "[concat(parameters('uniqueResourceNamePrefix'),'-topic')]",
+        "eventGridTopicName": "[concat(parameters('uniqueResourceNamePrefix'),'-events-topic')]",
         "eventGridFunctionSubscriptions": [
             {
                 "resourceName": "categoryUpdateCategorySynonyms",

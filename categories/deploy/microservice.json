@@ -26,8 +26,8 @@
         "cognitiveServicesSearchApiUrl": "https://api.cognitive.microsoft.com/bing/v7.0/images/search",
         "bigHugeThesaurusApiUrl": "http://words.bighugelabs.com/api/2/",
 
-        "eventGridTopicResourceId": "[resourceId(concat(parameters('uniqueResourceNamePrefix'),'-events'), 'Microsoft.EventGrid/topics', concat(parameters('uniqueResourceNamePrefix'),'-topic'))]",
-        "appInsightsResourceId": "[resourceId(concat(parameters('uniqueResourceNamePrefix'),'-monitor'), 'Microsoft.Insights/components', concat(parameters('uniqueResourceNamePrefix'),'-ai'))]"
+        "eventGridTopicResourceId": "[resourceId(concat(parameters('uniqueResourceNamePrefix'),'-events'), 'Microsoft.EventGrid/topics', concat(parameters('uniqueResourceNamePrefix'),'-events-topic'))]",
+        "appInsightsResourceId": "[resourceId(concat(parameters('uniqueResourceNamePrefix'),'-monitor'), 'Microsoft.Insights/components', concat(parameters('uniqueResourceNamePrefix'),'-monitor-ai'))]"
     },
     "resources": [
         {
