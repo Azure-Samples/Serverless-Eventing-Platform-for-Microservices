@@ -13,7 +13,7 @@ echo "Provide subscription ID: "
 read subscriptionId
 
 HOME=`pwd`
-echo "Provide an unique suffix string (recommended to autogenerate string to guarantee uniqueness): "
+echo "Provide any unique suffix string (max length 15 characters, recommended to autogenerate a string): "
 read uniqueSuffixString
 
 echo "Provide Big Huge Thesaurus API Key: "
@@ -28,7 +28,7 @@ echo "Creating Event Grid Topic..."
 az group create -n ContentReactor-Events -l westus2
 EVENT_GRID_TOPIC_NAME=contentreactor$uniqueSuffixString
 az group deployment create -g ContentReactor-Events --template-file $HOME/events/deploy/template.json --mode Complete --parameters uniqueResourceNameSuffix=$uniqueSuffixString
-
+sleep 2
 # Categories Microservice Deploy
 
 echo "Starting deploy of Categories Microservice..."
@@ -49,6 +49,7 @@ az webapp deployment source config-zip --resource-group ContentReactor-Categorie
 
 echo "Deploying Event Grid Subscription for Categories"
 az group deployment create -g ContentReactor-Events --template-file $HOME/categories/deploy/eventGridSubscriptions.json --parameters eventGridTopicName=$EVENT_GRID_TOPIC_NAME microserviceResourceGroupName=ContentReactor-Categories microserviceFunctionsWorkerApiAppName=$CATEGORIES_WORKER_API_NAME
+sleep 5
 
 # Images Microservice Deploy
 
@@ -58,7 +59,7 @@ az group deployment create -g ContentReactor-Images --template-file $HOME/images
 
 IMAGES_API_NAME=crimgapi$uniqueSuffixString
 IMAGES_WORKER_API_NAME=crimgwapi$uniqueSuffixString
-
+sleep 1
 echo "Creating Images Blob Storage..."
 IMAGES_BLOB_STORAGE_ACCOUNT_NAME=crimgblob$uniqueSuffixString
 az storage container create --account-name $IMAGES_BLOB_STORAGE_ACCOUNT_NAME --name fullimages
@@ -70,11 +71,13 @@ az storage cors add --account-name $IMAGES_BLOB_STORAGE_ACCOUNT_NAME --services 
 
 echo "Deploying Images Functions..."
 az webapp deployment source config-zip --resource-group ContentReactor-Images --name  $IMAGES_API_NAME --src $HOME/images/src/ContentReactor.Images/ContentReactor.Images.Api/bin/Release/netstandard2.0/ContentReactor.Images.Api.zip
+sleep 2
 az webapp deployment source config-zip --resource-group ContentReactor-Images --name $IMAGES_WORKER_API_NAME --src $HOME/images/src/ContentReactor.Images/ContentReactor.Images.WorkerApi/bin/Release/netstandard2.0/ContentReactor.Images.WorkerApi.zip
 
 echo "Deploying Event Grid Subscription for Images"
 az account set --subscription $subscriptionId
 az group deployment create -g ContentReactor-Events --template-file $HOME/images/deploy/eventGridSubscriptions.json --parameters eventGridTopicName=$EVENT_GRID_TOPIC_NAME microserviceResourceGroupName=ContentReactor-Images microserviceFunctionsWorkerApiAppName=$IMAGES_WORKER_API_NAME
+sleep 5
 
 # Audio Microservice Deploy
 
@@ -95,10 +98,12 @@ az storage cors add --account-name $AUDIO_BLOB_STORAGE_ACCOUNT_NAME --services b
 
 echo "Deploying Audio Functions..."
 az webapp deployment source config-zip --resource-group ContentReactor-Audio --name $AUDIO_API_NAME --src $HOME/audio/src/ContentReactor.Audio/ContentReactor.Audio.Api/bin/Release/netstandard2.0/ContentReactor.Audio.Api.zip
+sleep 3
 az webapp deployment source config-zip --resource-group ContentReactor-Audio --name $AUDIO_WORKER_API_NAME --src $HOME/audio/src/ContentReactor.Audio/ContentReactor.Audio.WorkerApi/bin/Release/netstandard2.0/ContentReactor.Audio.WorkerApi.zip
 
 echo "Deploying Event Grid Subscription for Audio"
 az group deployment create -g ContentReactor-Events --template-file $HOME/audio/deploy/eventGridSubscriptions.json --parameters eventGridTopicName=$EVENT_GRID_TOPIC_NAME microserviceResourceGroupName=ContentReactor-Audio microserviceFunctionsWorkerApiAppName=$AUDIO_WORKER_API_NAME
+sleep 5
 
 # Text Microservice Deploy
 
@@ -122,14 +127,24 @@ az group deployment create -g ContentReactor-Proxy --template-file $HOME/proxy/d
 PROXY_API_NAME=crapiproxy$uniqueSuffixString
 az webapp deployment source config-zip --resource-group ContentReactor-Proxy --name $PROXY_API_NAME --src $HOME/proxy/proxies/proxies.zip
 
-# Deploy Web 
+# Deploy Web
 echo "Starting deploy of Web..."
 az group create -n ContentReactor-Web -l westus2
 
 az group deployment create --name ContentReactorWeb-Deployment --resource-group ContentReactor-Web --template-file $HOME/web/deploy/template.json --parameters uniqueResourceNameSuffix=$uniqueSuffixString functionAppProxyName=crapiproxy$uniqueSuffixString
 WEB_APP_NAME=crweb$uniqueSuffixString
-
 webInstrumentationKey=$(az resource show --namespace microsoft.insights --resource-type components --name $WEB_APP_NAME-ai -g ContentReactor-Web --query properties.InstrumentationKey)
 sed -i -e 's/\"%INSTRUMENTATION_KEY%\"/'"$webInstrumentationKey"'/g' $HOME/web/src/signalr-web/SignalRMiddleware/EventApp/src/environments/environment.ts
+
+cd $HOME/web/src/signalr-web/SignalRMiddleware/EventApp
+npm install
+npm run ubuntu-dev-build
+
+cd $HOME/web/src/signalr-web/SignalRMiddleware/SignalRMiddleware
+dotnet publish -c Release
+
+cd $HOME/web/src/signalr-web/SignalRMiddleware/SignalRMiddleware/bin/Release/netcoreapp2.1/publish/
+zip -r SignalRMiddleware.zip .
+
 az webapp deployment source config-zip --resource-group ContentReactor-Web --name $WEB_APP_NAME --src $HOME/web/src/signalr-web/SignalRMiddleware/SignalRMiddleware/bin/Release/netcoreapp2.1/publish/SignalRMiddleware.zip
 az group deployment create -g ContentReactor-Events --template-file $HOME/web/deploy/eventGridSubscriptions.json --parameters eventGridTopicName=$EVENT_GRID_TOPIC_NAME appServiceName=$WEB_APP_NAME
