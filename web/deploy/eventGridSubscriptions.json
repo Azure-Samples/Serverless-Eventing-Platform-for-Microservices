@@ -2,20 +2,17 @@
     "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "eventGridTopicName": {
-            "type": "string"
-        },
-
-        "appServiceName": {
+        "uniqueResourceNamePrefix": {
             "type": "string"
         }
+
     },
     "variables": {
-        
+        "eventGridTopicName": "[concat(parameters('uniqueResourceNamePrefix'),'-events-topic')]",
         "eventGridFunctionSubscriptions": [
             {
-                "resourceName": "signalRCategoryNotifications", 
-                "webHookUrl" : "[concat('https://',parameters('appServiceName'), '.azurewebsites.net','/api/CategoryNotification')]",
+                "resourceName": "signalRCategoryNotifications",
+                "webHookUrl": "[concat('https://',parameters('appServiceName'), '.azurewebsites.net','/api/CategoryNotification')]",
                 "eventTypes": [
                     "CategorySynonymsUpdated",
                     "CategoryImageUpdated",
@@ -27,7 +24,7 @@
             },
             {
                 "resourceName": "signalRImageNotifications",
-                "webHookUrl" : "[concat('https://',parameters('appServiceName'), '.azurewebsites.net','/api/ImageNotification')]",
+                "webHookUrl": "[concat('https://',parameters('appServiceName'), '.azurewebsites.net','/api/ImageNotification')]",
                 "eventTypes": [
                     "ImageCaptionUpdated",
                     "ImageCreated",
@@ -36,7 +33,7 @@
             },
             {
                 "resourceName": "signalRAudioNotifications",
-                "webHookUrl" : "[concat('https://',parameters('appServiceName'), '.azurewebsites.net','/api/AudioNotification')]",
+                "webHookUrl": "[concat('https://',parameters('appServiceName'), '.azurewebsites.net','/api/AudioNotification')]",
                 "eventTypes": [
                     "AudioTranscriptUpdated",
                     "AudioCreated",
@@ -45,7 +42,7 @@
             },
             {
                 "resourceName": "signalRTextNotifications",
-                "webHookUrl" : "[concat('https://',parameters('appServiceName'), '.azurewebsites.net','/api/TextNotification')]",
+                "webHookUrl": "[concat('https://',parameters('appServiceName'), '.azurewebsites.net','/api/TextNotification')]",
                 "eventTypes": [
                     "TextCreated",
                     "TextDeleted",
