@@ -140,7 +140,7 @@
                     "apiVersion": "2014-11-01",
                     "properties": {
                         "FUNCTIONS_EXTENSION_VERSION": "beta",
-                        "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(variables('appInsightsResourceId'), '2014-04-01').InstrumentationKey]",
+                        "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('Microsoft.Insights/components', variables('applicationInsightsName')), '2014-04-01').InstrumentationKey]",
                         "CognitiveServicesSpeechApiEndpoint": "[variables('cognitiveServicesApiUrl')]",
                         "CognitiveServicesSpeechApiKey": "[listKeys(variables('cognitiveServicesAccountName'),'2016-02-01-preview').key1]",
                         "EventGridTopicEndpoint": "[reference(variables('eventGridTopicResourceId'), '2018-01-01').endpoint]",
