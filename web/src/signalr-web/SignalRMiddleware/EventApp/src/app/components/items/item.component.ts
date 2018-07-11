@@ -562,7 +562,7 @@ export class ItemComponent {
     
     }
     
-    openSubmitTextModal(content,textId:string) {
+    openSubmitTextModal(content) {
         this.inputText = ""
         this.modalService.open(content).result.then((result) => {        
             this.closeResult = `Closed with: ${result}`;
