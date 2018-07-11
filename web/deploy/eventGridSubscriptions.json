@@ -8,11 +8,12 @@
 
     },
     "variables": {
+        "appServiceName": "[concat(parameters('uniqueResourceNamePrefix'),'-web-app')]",
         "eventGridTopicName": "[concat(parameters('uniqueResourceNamePrefix'),'-events-topic')]",
         "eventGridFunctionSubscriptions": [
             {
                 "resourceName": "signalRCategoryNotifications",
-                "webHookUrl": "[concat('https://',parameters('appServiceName'), '.azurewebsites.net','/api/CategoryNotification')]",
+                "webHookUrl": "[concat('https://',variables('appServiceName'), '.azurewebsites.net','/api/CategoryNotification')]",
                 "eventTypes": [
                     "CategorySynonymsUpdated",
                     "CategoryImageUpdated",
@@ -24,7 +25,7 @@
             },
             {
                 "resourceName": "signalRImageNotifications",
-                "webHookUrl": "[concat('https://',parameters('appServiceName'), '.azurewebsites.net','/api/ImageNotification')]",
+                "webHookUrl": "[concat('https://',variables('appServiceName'), '.azurewebsites.net','/api/ImageNotification')]",
                 "eventTypes": [
                     "ImageCaptionUpdated",
                     "ImageCreated",
@@ -33,7 +34,7 @@
             },
             {
                 "resourceName": "signalRAudioNotifications",
-                "webHookUrl": "[concat('https://',parameters('appServiceName'), '.azurewebsites.net','/api/AudioNotification')]",
+                "webHookUrl": "[concat('https://',variables('appServiceName'), '.azurewebsites.net','/api/AudioNotification')]",
                 "eventTypes": [
                     "AudioTranscriptUpdated",
                     "AudioCreated",
@@ -42,7 +43,7 @@
             },
             {
                 "resourceName": "signalRTextNotifications",
-                "webHookUrl": "[concat('https://',parameters('appServiceName'), '.azurewebsites.net','/api/TextNotification')]",
+                "webHookUrl": "[concat('https://',variables('appServiceName'), '.azurewebsites.net','/api/TextNotification')]",
                 "eventTypes": [
                     "TextCreated",
                     "TextDeleted",
@@ -53,7 +54,7 @@
     },
     "resources": [
         {
-            "name": "[concat(parameters('eventGridTopicName'), '/Microsoft.EventGrid/', variables('eventGridFunctionSubscriptions')[copyIndex('eventGridFunctionSubscriptions')].resourceName)]",
+            "name": "[concat(variables('eventGridTopicName'), '/Microsoft.EventGrid/', variables('eventGridFunctionSubscriptions')[copyIndex('eventGridFunctionSubscriptions')].resourceName)]",
             "copy": {
                 "name": "eventGridFunctionSubscriptions",
                 "count": "[length(variables('eventGridFunctionSubscriptions'))]",
