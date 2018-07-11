@@ -1,23 +1,12 @@
 param(
     [Parameter(Mandatory=$true)]
     [string]
-    $ResourceGroupName,
-
-    [Parameter(Mandatory=$true)]
-    [string]
-    $DatabaseName,
-
-    [Parameter(Mandatory=$true)]
-    [string]
-    $CollectionName,
-
-    [Parameter(Mandatory=$true)]
-    [string]
-    $PartitionKeyPath,
-
-    [int]
-    $Throughput = 1000
+    $UniqueResourceNamePrefix
 )
+
+$ResourceGroupName = "$UniqueResourceNamePrefix-categories"
+$DatabaseName = "Categories"
+$CollectionName = "Categories"
 
 # Find the Cosmos DB account
 Write-Host 'Finding Cosmos DB account...'
@@ -28,8 +17,8 @@ $accountsJson = az cosmosdb list `
     2>&1
 if ($LASTEXITCODE -eq 0)
 {
-    $cosmosDBAccountName = $accountsJson
-    Write-Host "Found account $cosmosDBAccountName"
+    $CosmosDBAccountName = $accountsJson
+    Write-Host "Found account $CosmosDBAccountName"
 }
 else
 {
@@ -39,7 +28,7 @@ else
 # Create the database if it doesn't already exist
 Write-Host 'Checking if database exists...'
 $databaseExists = az cosmosdb database exists `
-	--name $cosmosDBAccountName `
+	--name $CosmosDBAccountName `
 	--db-name $DatabaseName `
 	--resource-group $ResourceGroupName
 if ($databaseExists -eq "false")
@@ -54,7 +43,7 @@ if ($databaseExists -eq "false")
 # Create the collection if it doesn't already exist
 Write-Host 'Checking if collection exists...'
 $collectionExists = az cosmosdb collection exists `
-	--name $cosmosDBAccountName `
+	--name $CosmosDBAccountName `
     --collection-name $CollectionName `
 	--db-name $DatabaseName `
 	--resource-group $ResourceGroupName
@@ -62,10 +51,10 @@ if ($collectionExists -eq "false")
 {
     Write-Host "Creating collection $CollectionName..."
     az cosmosdb collection create `
-        --name $cosmosDBAccountName `
+        --name $CosmosDBAccountName `
         --collection-name $CollectionName `
         --db-name $DatabaseName `
         --resource-group $ResourceGroupName `
-        --partition-key-path $PartitionKeyPath `
-        --throughput $Throughput
+        --partition-key-path "/userId" `
+        --throughput 400
 }
