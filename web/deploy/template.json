@@ -8,7 +8,7 @@
     },
     "variables": {
 
-        "resourceNamePrefix": "[concat(parameters('uniqueResourceNamePrefix'),'-proxy')]",
+        "resourceNamePrefix": "[concat(parameters('uniqueResourceNamePrefix'),'-web')]",
 
         "functionsAppServicePlanName": "[concat(variables('resourceNamePrefix'),'-asp')]",
         "functionsApiProxyAppName": "[concat(variables('resourceNamePrefix'),'-api')]",
@@ -17,7 +17,7 @@
 
         "urlSuffix": ".azurewebsites.net",
 
-        "functionAppProxyUrl": "[concat(variables('urlPrefix'), variables('resourceNamePrefix'), '-proxy-api', variables('urlSuffix'))]",
+        "functionAppProxyUrl": "[concat(variables('urlPrefix'), parameters('uniqueResourceNamePrefix'), '-proxy-api', variables('urlSuffix'))]",
 
         "appServicePlanName": "[concat(variables('resourceNamePrefix'), '-asp')]",
 
