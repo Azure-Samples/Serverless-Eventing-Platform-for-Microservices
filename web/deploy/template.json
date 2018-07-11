@@ -85,7 +85,7 @@
                     },
                     "properties": {
                         "FUNCTION_API_PROXY_ROOT": "[variables('functionAppProxyUrl')]",
-                        "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(variables('appInsightsResourceId'), '2014-04-01').InstrumentationKey]",
+                        "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('Microsoft.Insights/components', variables('applicationInsightsName')), '2014-04-01').InstrumentationKey]",
                         "WEBSITE_NODE_DEFAULT_VERSION": "6.9.1"
                     }
                 }
