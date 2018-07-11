@@ -88,7 +88,6 @@
                     },
                     "dependsOn": [
                         "[resourceId('Microsoft.Web/sites', variables('functionsApiAppName'))]",
-                        "[variables('appInsightsResourceId')]",
                         "[resourceId('Microsoft.CognitiveServices/accounts', variables('cognitiveServicesAccountName'))]"
                     ]
                 }
