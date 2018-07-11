@@ -14,6 +14,8 @@
     "variables": {
         "resourceNamePrefix": "[concat(parameters('uniqueResourceNamePrefix'),'-categories')]",
 
+        "applicationInsightsName": "[concat(variables('resourceNamePrefix'), '-ai')]",
+
         "functionsAppServicePlanName": "[concat(variables('resourceNamePrefix'),'-asp')]",
         "functionsApiAppName": "[concat(variables('resourceNamePrefix'),'-api')]",
         "functionsWorkerApiAppName": "[concat(variables('resourceNamePrefix'),'-worker')]",
@@ -26,10 +28,19 @@
         "cognitiveServicesSearchApiUrl": "https://api.cognitive.microsoft.com/bing/v7.0/images/search",
         "bigHugeThesaurusApiUrl": "http://words.bighugelabs.com/api/2/",
 
-        "eventGridTopicResourceId": "[resourceId(concat(parameters('uniqueResourceNamePrefix'),'-events'), 'Microsoft.EventGrid/topics', concat(parameters('uniqueResourceNamePrefix'),'-events-topic'))]",
-        "appInsightsResourceId": "[resourceId(concat(parameters('uniqueResourceNamePrefix'),'-monitor'), 'Microsoft.Insights/components', concat(parameters('uniqueResourceNamePrefix'),'-monitor-ai'))]"
+        "eventGridTopicResourceId": "[resourceId(concat(parameters('uniqueResourceNamePrefix'),'-events'), 'Microsoft.EventGrid/topics', concat(parameters('uniqueResourceNamePrefix'),'-events-topic'))]"
     },
     "resources": [
+        {
+            "name": "[variables('applicationInsightsName')]",
+            "type": "Microsoft.Insights/components",
+            "apiVersion": "2014-04-01",
+            "location": "[resourceGroup().location]",
+            "kind": "other",
+            "properties": {
+                "applicationId": "[variables('applicationInsightsName')]"
+            }
+        },
         {
             "name": "[variables('functionsAppServicePlanName')]",
             "type": "Microsoft.Web/serverfarms",
@@ -74,7 +85,7 @@
                     "apiVersion": "2014-11-01",
                     "properties": {
                         "FUNCTIONS_EXTENSION_VERSION": "beta",
-                        "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(variables('appInsightsResourceId'), '2014-04-01').InstrumentationKey]",
+                        "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('Microsoft.Insights/components', variables('applicationInsightsName')), '2014-04-01').InstrumentationKey]",
                         "EventGridTopicEndpoint": "[reference(variables('eventGridTopicResourceId'), '2018-01-01').endpoint]",
                         "EventGridTopicKey": "[listKeys(variables('eventGridTopicResourceId'), '2018-01-01').key1]",
                         "CosmosDbAccountEndpointUrl": "[reference(variables('cosmosDbAccountName')).documentEndpoint]",
@@ -117,7 +128,7 @@
                     "apiVersion": "2014-11-01",
                     "properties": {
                         "FUNCTIONS_EXTENSION_VERSION": "beta",
-                        "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(variables('appInsightsResourceId'), '2014-04-01').InstrumentationKey]",
+                        "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('Microsoft.Insights/components', variables('applicationInsightsName')), '2014-04-01').InstrumentationKey]",
                         "EventGridTopicEndpoint": "[reference(variables('eventGridTopicResourceId'), '2018-01-01').endpoint]",
                         "EventGridTopicKey": "[listKeys(variables('eventGridTopicResourceId'), '2018-01-01').key1]",
                         "CosmosDbAccountEndpointUrl": "[reference(variables('cosmosDbAccountName')).documentEndpoint]",

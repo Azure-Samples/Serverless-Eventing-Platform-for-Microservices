@@ -25,73 +25,83 @@
 
         "appHostingPlanNameVar": "[concat(variables('appServicePlanName'),'-apps')]",
 
-        "appInsightsResourceId": "[resourceId(concat(parameters('uniqueResourceNamePrefix'),'-monitor'), 'Microsoft.Insights/components', concat(parameters('uniqueResourceNamePrefix'),'-monitor-ai'))]"
+        "applicationInsightsName": "[concat(variables('resourceNamePrefix'), '-ai')]"
 
     },
     "resources": [
-      {
-        "name": "[variables('appHostingPlanNameVar')]",
-        "type": "Microsoft.Web/serverfarms",
-        "location": "[resourceGroup().location]",
-        "apiVersion": "2015-08-01",
-        "sku": {
-          "name": "F1"
-        },
-        "dependsOn": [ ],
-        "tags": {
-          "displayName": "appServicePlan"
-        },
-        "properties": {
-          "name": "[variables('appHostingPlanNameVar')]",
-          "numberOfWorkers": 1
-        }
-      },
-      {
-        "name": "[variables('appServiceName')]",
-        "type": "Microsoft.Web/sites",
-        "location": "[resourceGroup().location]",
-        "apiVersion": "2015-08-01",
-        "resources": [
-            {
-                "name": "web",
-                "type": "config",
-                "apiVersion": "2015-08-01",
-                "properties": {
-                    "webSocketsEnabled": true
-                },
-                "dependsOn": [
-                    "[resourceId('Microsoft.Web/sites', variables('appServiceName'))]"
-                ]
-            },
-            {
-                "name": "appsettings",
-                "type": "config",
-                "apiVersion": "2015-08-01",
-                "dependsOn": [
-                    "[resourceId('Microsoft.Web/sites', variables('appServiceName'))]"
-                ],
-                "tags": {
-                    "displayName": "WebAppSettings"
-                },
-                "properties": {
-                    "FUNCTION_API_PROXY_ROOT": "[variables('functionAppProxyUrl')]",
-                    "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(variables('appInsightsResourceId'), '2014-04-01').InstrumentationKey]",
-                    "WEBSITE_NODE_DEFAULT_VERSION": "6.9.1"
-                }
+        {
+            "name": "[variables('applicationInsightsName')]",
+            "type": "Microsoft.Insights/components",
+            "apiVersion": "2014-04-01",
+            "location": "[resourceGroup().location]",
+            "kind": "other",
+            "properties": {
+                "applicationId": "[variables('applicationInsightsName')]"
             }
-        ],
-        "tags": {
-          "[concat('hidden-related:', resourceId('Microsoft.Web/serverfarms', variables('appHostingPlanNameVar')))]": "Resource",
-          "displayName": "webApp"
         },
-        "properties": {
-          "name": "[variables('appServiceName')]",
-          "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('appHostingPlanNameVar'))]"
+        {
+            "name": "[variables('appHostingPlanNameVar')]",
+            "type": "Microsoft.Web/serverfarms",
+            "location": "[resourceGroup().location]",
+            "apiVersion": "2015-08-01",
+            "sku": {
+                "name": "F1"
+            },
+            "dependsOn": [],
+            "tags": {
+                "displayName": "appServicePlan"
+            },
+            "properties": {
+                "name": "[variables('appHostingPlanNameVar')]",
+                "numberOfWorkers": 1
+            }
         },
-        "dependsOn": [
-            "[resourceId('Microsoft.Web/serverfarms', variables('appHostingPlanNameVar'))]"
-        ]
-      }
-     ],
+        {
+            "name": "[variables('appServiceName')]",
+            "type": "Microsoft.Web/sites",
+            "location": "[resourceGroup().location]",
+            "apiVersion": "2015-08-01",
+            "resources": [
+                {
+                    "name": "web",
+                    "type": "config",
+                    "apiVersion": "2015-08-01",
+                    "properties": {
+                        "webSocketsEnabled": true
+                    },
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Web/sites', variables('appServiceName'))]"
+                    ]
+                },
+                {
+                    "name": "appsettings",
+                    "type": "config",
+                    "apiVersion": "2015-08-01",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Web/sites', variables('appServiceName'))]"
+                    ],
+                    "tags": {
+                        "displayName": "WebAppSettings"
+                    },
+                    "properties": {
+                        "FUNCTION_API_PROXY_ROOT": "[variables('functionAppProxyUrl')]",
+                        "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(variables('appInsightsResourceId'), '2014-04-01').InstrumentationKey]",
+                        "WEBSITE_NODE_DEFAULT_VERSION": "6.9.1"
+                    }
+                }
+            ],
+            "tags": {
+                "[concat('hidden-related:', resourceId('Microsoft.Web/serverfarms', variables('appHostingPlanNameVar')))]": "Resource",
+                "displayName": "webApp"
+            },
+            "properties": {
+                "name": "[variables('appServiceName')]",
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('appHostingPlanNameVar'))]"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/serverfarms', variables('appHostingPlanNameVar'))]"
+            ]
+        }
+    ],
     "outputs": {}
   }

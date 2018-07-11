@@ -22,14 +22,6 @@ read bigHugeThesaurusApiKey
 az login --service-principal --username $servicePrincipalAppId --password $servicePrincipalPassword --tenant $servicePrincipalTenantId
 az account set --subscription $subscriptionId 
 
-# Creating Monitoring App Insights
-
-echo "Creating Event Grid Topic..."
-az group create -n $uniquePrefixString"-monitor" -l westus2
-EVENT_GRID_TOPIC_NAME=$uniquePrefixString"-monitor-topic"
-az group deployment create -g $uniquePrefixString"-monitor" --template-file $HOME/monitor/deploy/template.json --mode Complete --parameters uniqueResourceNamePrefix=$uniquePrefixString
-sleep 2
-
 # Creating Event Grid Topic
 
 echo "Creating Event Grid Topic..."

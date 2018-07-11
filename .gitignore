@@ -298,3 +298,5 @@ src/Web/content-reactor/wwwroot/dist/bundle.js
 /.nuget/NuGet
 /proxy/proxies/proxies.zip
 /web/src/signalr-web/SignalRMiddleware/SignalRMiddleware/wwwroot
+/scripts/delete.sh
+/scripts/.azure

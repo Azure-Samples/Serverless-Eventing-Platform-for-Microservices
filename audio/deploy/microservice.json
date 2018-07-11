@@ -10,6 +10,8 @@
     "variables": {
         "resourceNamePrefix": "[concat(parameters('uniqueResourceNamePrefix'),'-audio')]",
 
+        "applicationInsightsName": "[concat(variables('resourceNamePrefix'), '-ai')]",
+
         "functionsAppServicePlanName": "[concat(variables('resourceNamePrefix'),'-asp')]",
         "functionsApiAppName": "[concat(variables('resourceNamePrefix'),'-api')]",
         "functionsWorkerApiAppName": "[concat(variables('resourceNamePrefix'),'-worker')]",
@@ -19,10 +21,19 @@
         "cognitiveServicesAccountName": "[concat(variables('resourceNamePrefix'), '-cs')]",
         "cognitiveServicesApiUrl": "https://speech.platform.bing.com/speech/recognition/interactive/cognitiveservices/v1?language=en-us&format=detailed",
 
-        "eventGridTopicResourceId": "[resourceId(concat(parameters('uniqueResourceNamePrefix'),'-events'), 'Microsoft.EventGrid/topics', concat(parameters('uniqueResourceNamePrefix'),'-events-topic'))]",
-        "appInsightsResourceId": "[resourceId(concat(parameters('uniqueResourceNamePrefix'),'-monitor'), 'Microsoft.Insights/components', concat(parameters('uniqueResourceNamePrefix'),'-monitor-ai'))]"
+        "eventGridTopicResourceId": "[resourceId(concat(parameters('uniqueResourceNamePrefix'),'-events'), 'Microsoft.EventGrid/topics', concat(parameters('uniqueResourceNamePrefix'),'-events-topic'))]"
     },
     "resources": [
+        {
+            "name": "[variables('applicationInsightsName')]",
+            "type": "Microsoft.Insights/components",
+            "apiVersion": "2014-04-01",
+            "location": "[resourceGroup().location]",
+            "kind": "other",
+            "properties": {
+                "applicationId": "[variables('applicationInsightsName')]"
+            }
+        },
         {
             "name": "[variables('blobAccountName')]",
             "type": "Microsoft.Storage/storageAccounts",
@@ -90,7 +101,7 @@
                     "apiVersion": "2014-11-01",
                     "properties": {
                         "FUNCTIONS_EXTENSION_VERSION": "beta",
-                        "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(variables('appInsightsResourceId'), '2014-04-01').InstrumentationKey]",
+                        "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('Microsoft.Insights/components', variables('applicationInsightsName')), '2014-04-01').InstrumentationKey]",
                         "CognitiveServicesSpeechApiEndpoint": "[variables('cognitiveServicesApiUrl')]",
                         "CognitiveServicesSpeechApiKey": "[listKeys(variables('cognitiveServicesAccountName'),'2016-02-01-preview').key1]",
                         "EventGridTopicEndpoint": "[reference(variables('eventGridTopicResourceId'), '2018-01-01').endpoint]",
