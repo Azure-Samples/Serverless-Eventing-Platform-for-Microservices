@@ -357,7 +357,7 @@ The web app is deployed into its own resource group. It has its own ARM template
 
  2. **Deploy ARM Template:** Use the _Azure Resource Group Deployment_ task, with the _Action_ set to `Create or update resource group`. Set the _Template_ to the location of the `template.json` file, e.g. `$(System.DefaultWorkingDirectory)/web/deploy/template.json`. Set the _Overridable template parameters_ to the following: `-functionAppProxyName {function-app-proxy-name}`
 
- 3. **Deploy API:** Use the _Azure App Service Deploy_ task, with the _App type_ set to `Function app`. Set the _App Service name_ to `contentreactor$(UniqueResourceNameSuffix)`. Set the _Package or folder_ to the relative location of the `.zip` file for the front-end API, e.g. `$(System.DefaultWorkingDirectory)/Web-CI/webapp/*.zip`.
+ 3. **Deploy API:** Use the _Azure App Service Deploy_ task, with the _App type_ set to `Web App`. Set the _App Service name_ to `crweb$(UniqueResourceNameSuffix)`. Set the _Package or folder_ to the relative location of the `.zip` file for the front-end API, e.g. `$(System.DefaultWorkingDirectory)/Web-CI/webapp/*.zip`.
 
  4. **Deploy Event Subscriptions ARM Template:** Use the _Azure Resource Group Deployment_ task, with the _Action_ set to `Create or update resource group`. Set the _Template_ to the location of the `eventGridSubscriptions.json` file, e.g. `$(System.DefaultWorkingDirectory)/web/deploy/eventGridSubscriptions.json`. Set the _Overridable template parameters_ to the following: `eventGridTopicName={event-grid-topic-name}  appServiceName={app-service-name}`
 

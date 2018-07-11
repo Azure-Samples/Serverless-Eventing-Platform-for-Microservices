@@ -3,18 +3,25 @@
 resources:
 - repo: self
 queue:
-  name: ContentReactor-Web-CI
   demands: 
   - npm
   - msbuild
 
 steps:
 
-# Build Angular App
+# Install Angular App Dependencies
 - task: Npm@1
+  name: InstallNpmPackages
+  displayName: Install Angular App Dependencies
   inputs:
+    command: install
     workingDir: 'web/src/signalr-web/SignalRMiddleware/EventApp'
-    verbose: false
+    verbose: true
+
+# Package Angular App
+- script: npm run dist
+  displayName: Package Angular App
+  workingDirectory: 'web/src/signalr-web/SignalRMiddleware/EventApp'
 
 # Build the SignalR ASP.NET WebApp
 - task: DotNetCoreCLI@2
