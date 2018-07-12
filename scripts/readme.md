@@ -31,7 +31,23 @@ Note: Before creating a service principal, make sure you set your preferred subs
 9. Big Huge Thesaurus is an external API used by one of the microservices in this sample. Make sure you get a thesaurus key [here](https://words.bighugelabs.com/api.php) 
 
 From the root folder of the repository execute the following commands on the Ubuntu WSL:
-1. sh scripts/build.sh
-2. sh scripts/deploy.sh
+
+        sh scripts/build.sh
+        sh scripts/deploy.sh
+
+To run scripts in parallel for a faster deploy time run the following:
+
+        sh scripts/deploy-parallel.sh
+
+If you would like to deploy a single resource group run one of the following commands:
+
+        sh scripts/deploy-only-events.sh
+        sh scripts/deploy-only-categories.sh
+        sh scripts/deploy-only-images.sh
+        sh scripts/deploy-only-audio.sh
+        sh scripts/deploy-only-text.sh
+        sh scripts/deploy-only-proxy.sh
+        sh scripts/deploy-only-web.sh
+
 
 

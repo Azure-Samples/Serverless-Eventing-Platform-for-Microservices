@@ -40,7 +40,6 @@ We have used the following resource group names:
 * `{your-globally-unique-prefix}-categories`
 * `{your-globally-unique-prefix}-events`
 * `{your-globally-unique-prefix}-images`
-* `{your-globally-unique-prefix}-monitor`
 * `{your-globally-unique-prefix}-proxy`
 * `{your-globally-unique-prefix}-text`
 * `{your-globally-unique-prefix}-web`
@@ -61,7 +60,6 @@ you can execute the following commands to create the resource groups:
 * `az group create -n {your-globally-unique-prefix}-categories -l westus2`
 * `az group create -n {your-globally-unique-prefix}-events -l westus2`
 * `az group create -n {your-globally-unique-prefix}-images -l westus2`
-* `az group create -n {your-globally-unique-prefix}-monitor -l westus2`
 * `az group create -n {your-globally-unique-prefix}-proxy -l westus2`
 * `az group create -n {your-globally-unique-prefix}-text -l westus2`
 * `az group create -n {your-globally-unique-prefix}-web -l westus2`
@@ -71,7 +69,7 @@ you can execute the following commands to create the resource groups:
 ### Build Using VSTS
 
 Each of the subfolders in this repository (`audio`, `categories`, `events`, 
-`images`, `monitor`, `proxy`, `text`, and `web`) 
+`images`, `proxy`, `text`, and `web`) 
 contains a `build` subfolder with a `build.yaml` file. The `build.yaml` 
 files contain the list of VSTS build steps that are required for that component.
 
@@ -145,7 +143,6 @@ zipped into a single file.
 To deploy Content Reactor into your own Azure subscription, you will need to ensure 
 you follow the correct sequence:
 
- 1. Deploy the App Insights instance.
  2. Deploy the Event Grid topic.
  3. Deploy the four microservices (audio, categories, images, text).
  4. Deploy the proxy.
@@ -154,29 +151,6 @@ you follow the correct sequence:
 The sample includes ARM templates for each component. Each ARM template contains a 
 `uniqueResourceNamePrefix` parameter that must be set to a globally unique value. 
 The instructions for VSTS below include creating a globablly unique value. 
-
-### Deploying App Insights
-
-The App Insights instance is deployed using the `monitor/deploy/template.json` 
-ARM template.
-
-#### Deploying App Insights Using VSTS
-
-**Deploy ARM Template:** Use the _Azure Resource Group Deployment_ task, with 
-the _Action_ set to `Create or update resource group`. Set the _Template_ 
-to the location of the `template.json` file, 
-e.g. `$(System.DefaultWorkingDirectory)/Monitor-CI/deploy/template.json`. 
-Set the _Overridable template parameters_ setting to 
-`-uniqueResourceNamePrefix {your-globally-unique-prefix}`.
-
-#### Deploying App Insights Manually
-
-The monitoring ARM template can be manually deployed using the Azure CLI 
-with the following command:
-
-`az group deployment create -g {your-globally-unique-prefix}-monitor 
---template-file monitor/deploy/template.json --mode Complete 
---parameters uniqueResourceNamePrefix={your-globally-unique-prefix}`
 
 ### Deploying Event Grid Topic
 
