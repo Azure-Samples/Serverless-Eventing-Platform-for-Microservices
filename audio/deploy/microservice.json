@@ -2,40 +2,38 @@
     "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "uniqueResourceNameSuffix": {
+        "uniqueResourceNamePrefix": {
             "type": "string",
-            "defaultValue": "[uniqueString(subscription().subscriptionId, resourceGroup().id)]"
-        },
-
-        "eventsResourceGroupName": {
-            "type": "string"
-        },
-        "eventGridTopicName": {
-            "type": "string"
-        },
-
-        "applicationInsightsLocation": {
-            "type": "string",
-            "defaultValue": "westus2"
+            "defaultValue": ""
         }
     },
     "variables": {
-        "resourceNamePrefix": "craud",
+        "resourceNamePrefix": "[concat(parameters('uniqueResourceNamePrefix'),'-audio')]",
 
-        "applicationInsightsName": "[concat(variables('resourceNamePrefix'), 'ai', parameters('uniqueResourceNameSuffix'))]",
+        "applicationInsightsName": "[concat(variables('resourceNamePrefix'), '-ai')]",
 
-        "functionsAppServicePlanName": "[concat(variables('resourceNamePrefix'), 'fnasp', parameters('uniqueResourceNameSuffix'))]",
-        "functionsApiAppName": "[concat(variables('resourceNamePrefix'), 'api', parameters('uniqueResourceNameSuffix'))]",
-        "functionsWorkerApiAppName": "[concat(variables('resourceNamePrefix'), 'wapi', parameters('uniqueResourceNameSuffix'))]",
+        "functionsAppServicePlanName": "[concat(variables('resourceNamePrefix'),'-asp')]",
+        "functionsApiAppName": "[concat(variables('resourceNamePrefix'),'-api')]",
+        "functionsWorkerApiAppName": "[concat(variables('resourceNamePrefix'),'-worker')]",
 
-        "blobAccountName": "[concat(variables('resourceNamePrefix'), 'blob', parameters('uniqueResourceNameSuffix'))]",
+        "blobAccountName": "[concat(parameters('uniqueResourceNamePrefix'),'audioblob')]",
 
-        "cognitiveServicesAccountName": "[concat(variables('resourceNamePrefix'), 'cs', parameters('uniqueResourceNameSuffix'))]",
+        "cognitiveServicesAccountName": "[concat(variables('resourceNamePrefix'), '-cs')]",
         "cognitiveServicesApiUrl": "https://speech.platform.bing.com/speech/recognition/interactive/cognitiveservices/v1?language=en-us&format=detailed",
-        
-        "eventGridTopicResourceId": "[resourceId(parameters('eventsResourceGroupName'), 'Microsoft.EventGrid/topics', parameters('eventGridTopicName'))]"
+
+        "eventGridTopicResourceId": "[resourceId(concat(parameters('uniqueResourceNamePrefix'),'-events'), 'Microsoft.EventGrid/topics', concat(parameters('uniqueResourceNamePrefix'),'-events-topic'))]"
     },
     "resources": [
+        {
+            "name": "[variables('applicationInsightsName')]",
+            "type": "Microsoft.Insights/components",
+            "apiVersion": "2014-04-01",
+            "location": "[resourceGroup().location]",
+            "kind": "other",
+            "properties": {
+                "applicationId": "[variables('applicationInsightsName')]"
+            }
+        },
         {
             "name": "[variables('blobAccountName')]",
             "type": "Microsoft.Storage/storageAccounts",
@@ -56,17 +54,6 @@
                     },
                     "keySource": "Microsoft.Storage"
                 }
-            }
-        },
-
-        {
-            "name": "[variables('applicationInsightsName')]",
-            "type": "Microsoft.Insights/components",
-            "apiVersion": "2014-04-01",
-            "location": "[parameters('applicationInsightsLocation')]",
-            "kind": "other",
-            "properties": {
-                "applicationId": "[variables('applicationInsightsName')]"
             }
         },
 
@@ -123,7 +110,6 @@
                     },
                     "dependsOn": [
                         "[resourceId('Microsoft.Web/sites', variables('functionsApiAppName'))]",
-                        "[resourceId('Microsoft.Insights/components', variables('applicationInsightsName'))]",
                         "[resourceId('Microsoft.Storage/storageAccounts', variables('blobAccountName'))]",
                         "[resourceId('Microsoft.CognitiveServices/accounts', variables('cognitiveServicesAccountName'))]"
                     ]
@@ -163,7 +149,6 @@
                     },
                     "dependsOn": [
                         "[resourceId('Microsoft.Web/sites', variables('functionsWorkerApiAppName'))]",
-                        "[resourceId('Microsoft.Insights/components', variables('applicationInsightsName'))]",
                         "[resourceId('Microsoft.Storage/storageAccounts', variables('blobAccountName'))]",
                         "[resourceId('Microsoft.CognitiveServices/accounts', variables('cognitiveServicesAccountName'))]"
                     ]

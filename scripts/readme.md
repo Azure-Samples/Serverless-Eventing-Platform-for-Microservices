@@ -3,17 +3,20 @@
 The build.sh and deploy.sh scripts are meant to be run in Ubuntu WSL. Here are the pre-requisite installations before these scripts can be run:
 
 1. Install Ubuntu WSL or you can use a Ubuntu bash shell
+2. Install Zip
+        
+        sudo apt-get update
+        sudo apt-get install zip        
+
 2. Run fromdos command on both these scripts to convert them from dos to unix.
     
-    sudo apt-get update
-    
-    sudo apt-get install tofrodos
+        sudo apt-get update
+        sudo apt-get install tofrodos
 
 3. The command 'which node' should point to a node installation in ubuntu (eg: /usr/bin/node)
 
-    curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash
-    
-    sudo apt-get install -y nodejs
+        curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash
+        sudo apt-get install -y nodejs
     
 4. The command 'which npm' should point to an npm installation in ubuntu (eg: /usr/bin/npm)
 5. Make sure 'node --version' returns a Node.js version > 8 (eg: v8.11.3)
@@ -28,7 +31,23 @@ Note: Before creating a service principal, make sure you set your preferred subs
 9. Big Huge Thesaurus is an external API used by one of the microservices in this sample. Make sure you get a thesaurus key [here](https://words.bighugelabs.com/api.php) 
 
 From the root folder of the repository execute the following commands on the Ubuntu WSL:
-1. sh scripts/build.sh
-2. sh scripts/deploy.sh
+
+        sh scripts/build.sh
+        sh scripts/deploy.sh
+
+To run scripts in parallel for a faster deploy time run the following:
+
+        sh scripts/deploy-parallel.sh
+
+If you would like to deploy a single resource group run one of the following commands:
+
+        sh scripts/deploy-only-events.sh
+        sh scripts/deploy-only-categories.sh
+        sh scripts/deploy-only-images.sh
+        sh scripts/deploy-only-audio.sh
+        sh scripts/deploy-only-text.sh
+        sh scripts/deploy-only-proxy.sh
+        sh scripts/deploy-only-web.sh
+
 
 

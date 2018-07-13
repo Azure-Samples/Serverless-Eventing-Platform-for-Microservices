@@ -292,9 +292,11 @@ src/Web/content-reactor/wwwroot/dist/bundle.js
 /web/src/signalr-web/SignalRMiddleware/EventApp/.vscode/launch.json
 /.azure
 /.config/configstore
-/proxy/proxies/proxies.zip
-/.nuget/NuGet
-/.npm
-/.node-gyp/8.11.3
 /.dotnet
+/.node-gyp/8.11.3
+/.npm
+/.nuget/NuGet
+/proxy/proxies/proxies.zip
 /web/src/signalr-web/SignalRMiddleware/SignalRMiddleware/wwwroot
+/scripts/delete.sh
+/scripts/.azure

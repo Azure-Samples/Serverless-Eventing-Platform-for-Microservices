@@ -2,49 +2,35 @@
     "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "uniqueResourceNameSuffix": {
-            "type": "string",
-            "defaultValue": "[uniqueString(subscription().subscriptionId, resourceGroup().id)]"
-        },
-
-        "eventsResourceGroupName": {
+        "uniqueResourceNamePrefix": {
             "type": "string"
-        },
-        "eventGridTopicName": {
-            "type": "string"
-        },
-
-        "applicationInsightsLocation": {
-            "type": "string",
-            "defaultValue": "westus2"
         }
     },
     "variables": {
-        "resourceNamePrefix": "crtxt",
+        "resourceNamePrefix": "[concat(parameters('uniqueResourceNamePrefix'),'-text')]",
 
-        "applicationInsightsName": "[concat(variables('resourceNamePrefix'), 'ai', parameters('uniqueResourceNameSuffix'))]",
+        "applicationInsightsName": "[concat(variables('resourceNamePrefix'), '-ai')]",
 
-        "functionsAppServicePlanName": "[concat(variables('resourceNamePrefix'), 'fnasp', parameters('uniqueResourceNameSuffix'))]",
-        "functionsApiAppName": "[concat(variables('resourceNamePrefix'), 'api', parameters('uniqueResourceNameSuffix'))]",
+        "functionsAppServicePlanName": "[concat(variables('resourceNamePrefix'),'-asp')]",
+        "functionsApiAppName": "[concat(variables('resourceNamePrefix'),'-api')]",
 
-        "cosmosDbAccountName": "[concat(variables('resourceNamePrefix'), 'db', parameters('uniqueResourceNameSuffix'))]",
+        "cosmosDbAccountName": "[concat(variables('resourceNamePrefix'), '-db')]",
         "cosmosDbDatabaseName": "Text",
         "cosmosDbCollectionName": "Text",
 
-        "eventGridTopicResourceId": "[resourceId(parameters('eventsResourceGroupName'), 'Microsoft.EventGrid/topics', parameters('eventGridTopicName'))]"
+        "eventGridTopicResourceId": "[resourceId(concat(parameters('uniqueResourceNamePrefix'),'-events'), 'Microsoft.EventGrid/topics', concat(parameters('uniqueResourceNamePrefix'),'-events-topic'))]"
     },
     "resources": [
         {
             "name": "[variables('applicationInsightsName')]",
             "type": "Microsoft.Insights/components",
             "apiVersion": "2014-04-01",
-            "location": "[parameters('applicationInsightsLocation')]",
+            "location": "[resourceGroup().location]",
             "kind": "other",
             "properties": {
                 "applicationId": "[variables('applicationInsightsName')]"
             }
         },
-
         {
             "name": "[variables('functionsAppServicePlanName')]",
             "type": "Microsoft.Web/serverfarms",
@@ -99,7 +85,6 @@
                     },
                     "dependsOn": [
                         "[resourceId('Microsoft.Web/sites', variables('functionsApiAppName'))]",
-                        "[resourceId('Microsoft.Insights/components', variables('applicationInsightsName'))]",
                         "[resourceId('Microsoft.DocumentDB/databaseAccounts', variables('cosmosDbAccountName'))]"
                     ]
                 }

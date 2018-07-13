@@ -2,18 +2,12 @@
     "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "eventGridTopicName": {
-            "type": "string"
-        },
-
-        "microserviceResourceGroupName": {
-            "type": "string"
-        },
-        "microserviceFunctionsWorkerApiAppName": {
+        "uniqueResourceNamePrefix": {
             "type": "string"
         }
     },
     "variables": {
+        "eventGridTopicName": "[concat(parameters('uniqueResourceNamePrefix'),'-events-topic')]",
         "eventGridFunctionSubscriptions": [
             {
                 "resourceName": "imageUpdateImageCaption",
@@ -26,7 +20,7 @@
     },
     "resources": [
         {
-            "name": "[concat(parameters('eventGridTopicName'), '/Microsoft.EventGrid/', variables('eventGridFunctionSubscriptions')[copyIndex('eventGridFunctionSubscriptions')].resourceName)]",
+            "name": "[concat(variables('eventGridTopicName'), '/Microsoft.EventGrid/', variables('eventGridFunctionSubscriptions')[copyIndex('eventGridFunctionSubscriptions')].resourceName)]",
             "copy": {
                 "name": "eventGridFunctionSubscriptions",
                 "count": "[length(variables('eventGridFunctionSubscriptions'))]",
@@ -39,7 +33,7 @@
                 "destination": {
                     "endpointType": "WebHook",
                     "properties": {
-                        "endpointUrl": "[listsecrets(resourceId(parameters('microserviceResourceGroupName'), 'Microsoft.Web/sites/functions', parameters('microserviceFunctionsWorkerApiAppName'), variables('eventGridFunctionSubscriptions')[copyIndex('eventGridFunctionSubscriptions')].functionName),'2015-08-01').trigger_url]"
+                        "endpointUrl": "[listsecrets(resourceId(concat(parameters('uniqueResourceNamePrefix'),'-images'), 'Microsoft.Web/sites/functions', concat(parameters('uniqueResourceNamePrefix'),'-images-worker'), variables('eventGridFunctionSubscriptions')[copyIndex('eventGridFunctionSubscriptions')].functionName),'2015-08-01').trigger_url]"
                     }
                 },
                 "filter": {
