@@ -9,22 +9,22 @@
   <ItemGroup>
     <Compile Remove="event-app\**" />
     <Compile Remove="EventApp\**" />
+    <Compile Remove="wwwroot\**" />
     <Content Remove="event-app\**" />
     <Content Remove="EventApp\**" />
+    <Content Remove="wwwroot\**" />
     <EmbeddedResource Remove="event-app\**" />
     <EmbeddedResource Remove="EventApp\**" />
+    <EmbeddedResource Remove="wwwroot\**" />
     <None Remove="event-app\**" />
     <None Remove="EventApp\**" />
+    <None Remove="wwwroot\**" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.3.0" />
     <PackageReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.1.0" PrivateAssets="All" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="wwwroot\" />
   </ItemGroup>
 
   <!--<Target Name="PreBuild" BeforeTargets="PreBuildEvent">
