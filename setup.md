@@ -42,7 +42,7 @@ Alternatively, you may also prefer to use the Azure CLI to create the resource g
 
 Each of the subfolders in this repository (`audio`, `categories`, `events`, `images`, `proxy`, `text`, and `web`) contains a `build` subfolder with a `build.yaml` file. The `build.yaml` files contain the list of Azure Pipelines build steps that are required for that component.
 
-To use Azure Pipelines to build the Content Reactor system, you will need to set up multiple build configurations - one for each component with a `build.yaml` file. [Follow the instructions here](https://docs.microsoft.com/en-us/Azure Pipelines/build-release/actions/build-yaml?view=Azure Pipelines#manually-create-a-yaml-build-definition) to create each build definition and select the appropriate `build.yaml` file.
+To use Azure Pipelines to build the Content Reactor system, you will need to set up multiple build configurations - one for each component with a `build.yaml` file. [Follow the instructions here](https://docs.microsoft.com/en-us/azure/devops/pipelines/get-started-yaml?view=vsts#manually-create-a-yaml-build-definition) to create each build definition and select the appropriate `build.yaml` file.
 
 After all the build definitions have been created, queue builds using those definitions
 
