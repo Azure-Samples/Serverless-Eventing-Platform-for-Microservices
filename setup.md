@@ -2,9 +2,9 @@
 
 ## Deploying Content Reactor
 
-Content Reactor can be built and deployed into your own Azure subscription. You can use VSTS to run builds and releases, or if you prefer, you can run the build and deployment steps manually. We assume that you have an Azure subscription available to run the sample; [you can get a free trial Azure subscription here](https://azure.microsoft.com/en-us/free/).
+Content Reactor can be built and deployed into your own Azure subscription. You can use Azure Pipelines to run builds and releases, or if you prefer, you can run the build and deployment steps manually. We assume that you have an Azure subscription available to run the sample; [you can get a free trial Azure subscription here](https://azure.microsoft.com/en-us/free/).
 
-This guide explains the steps to build and deploy Content Reactor, both using VSTS and manually. For manual deployments we suggest using the [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest), a cross-platform command-line interface for Azure.
+This guide explains the steps to build and deploy Content Reactor, both using Azure Pipelines and manually. For manual deployments we suggest using the [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest), a cross-platform command-line interface for Azure.
 
 The overall sequence involved in building and deploying Content Reactor is:
 
@@ -38,11 +38,11 @@ Alternatively, you may also prefer to use the Azure CLI to create the resource g
 
 ## Building Content Reactor
 
-### Using VSTS
+### Using Azure Pipelines
 
-Each of the subfolders in this repository (`audio`, `categories`, `events`, `images`, `proxy`, `text`, and `web`) contains a `build` subfolder with a `build.yaml` file. The `build.yaml` files contain the list of VSTS build steps that are required for that component.
+Each of the subfolders in this repository (`audio`, `categories`, `events`, `images`, `proxy`, `text`, and `web`) contains a `build` subfolder with a `build.yaml` file. The `build.yaml` files contain the list of Azure Pipelines build steps that are required for that component.
 
-To use VSTS to build the Content Reactor system, you will need to set up multiple build configurations - one for each component with a `build.yaml` file. [Follow the instructions here](https://docs.microsoft.com/en-us/vsts/build-release/actions/build-yaml?view=vsts#manually-create-a-yaml-build-definition) to create each build definition and select the appropriate `build.yaml` file.
+To use Azure Pipelines to build the Content Reactor system, you will need to set up multiple build configurations - one for each component with a `build.yaml` file. [Follow the instructions here](https://docs.microsoft.com/en-us/azure/devops/pipelines/get-started-yaml?view=vsts#manually-create-a-yaml-build-definition) to create each build definition and select the appropriate `build.yaml` file.
 
 After all the build definitions have been created, queue builds using those definitions
 
@@ -93,13 +93,13 @@ To deploy Content Reactor into your own Azure subscription, you will need to ens
  3. Deploy the proxy.
  4. Deploy the web front-end.
 
-The sample includes ARM templates for each component. Each ARM template contains a `uniqueResourceNameSuffix` parameter that must be set to a globally unique value. The instructions for VSTS below include creating a globablly unique value. When manually deploying the components, if you do not specify your own suffix then the ARM template will create a 13-character random string and use that.
+The sample includes ARM templates for each component. Each ARM template contains a `uniqueResourceNameSuffix` parameter that must be set to a globally unique value. The instructions for Azure Pipelines below include creating a globablly unique value. When manually deploying the components, if you do not specify your own suffix then the ARM template will create a 13-character random string and use that.
 
 ## Deploying Event Grid Topic
 
 The Event Grid topic is deployed using the `events/deploy/template.json` ARM template.
 
-### Deploying Resources Using VSTS
+### Deploying Resources Using Azure Pipelines
 
 Create a release configuration with two steps:
 
@@ -121,7 +121,7 @@ If you want to specify a custom topic name suffix, use the following command ins
 
 Each microservice deployment requires multiple steps:
 
-* **Deploy ARM template:** The microservice's ARM template is deployed. Each microservice has a `deploy/microservice.json` file containing its ARM template. The `eventGridTopicName` and `eventsResourceGroupName` parameters should be set to the name of the Event Grid custom topic and the resource group it's contained in. Optionally, the `uniqueResourceNameSuffix` parameter can be set to a unique string that is appended to each resource name, making the names unique across Azure. We recommend doing this explicitly when you are using VSTS, so that VSTS can then use the suffix to find the other resource names for the subsequent steps in the deployments.
+* **Deploy ARM template:** The microservice's ARM template is deployed. Each microservice has a `deploy/microservice.json` file containing its ARM template. The `eventGridTopicName` and `eventsResourceGroupName` parameters should be set to the name of the Event Grid custom topic and the resource group it's contained in. Optionally, the `uniqueResourceNameSuffix` parameter can be set to a unique string that is appended to each resource name, making the names unique across Azure. We recommend doing this explicitly when you are using Azure Pipelines, so that Azure Pipelines can then use the suffix to find the other resource names for the subsequent steps in the deployments.
 * **Configure the data storage for each microservice:** For the images and audio microservices, Azure Storage blob containers are created and CORS policies set to allow web clients to access blobs directly. For the categories and text microservices, Cosmos DB containers are created.
 * **Deploy application code:** The application code then is deployed into the Azure Functions applications. There are a number of deployment options available for Azure Functions including [Git](https://docs.microsoft.com/en-us/azure/app-service/app-service-deploy-local-git), [cloud folders](https://docs.microsoft.com/en-us/azure/app-service/app-service-deploy-content-sync), [`zip`/`war` files](https://docs.microsoft.com/en-us/azure/app-service/app-service-deploy-zip), and [FTP](https://docs.microsoft.com/en-us/azure/app-service/app-service-deploy-ftp). In the examples below we will use the Azure CLI to perform deployments using `zip` files..
 * **Deploy Event Grid subscription ARM templates:** Finally, any necessary Event Grid subscriptions are created on the Event Grid topic, to ensure that relevant event types are forwarded to the microservice. Each microservice that requires Event Grid Subscriptions has an ARM template named `eventGridSubscriptions.json` in its `deploy` folder.
@@ -130,9 +130,9 @@ The following sections provide full detail on how to set up the deployments.
 
 Note that the categories microservice requires that you [obtain an API key for Big Huge Thesaurus.](https://words.bighugelabs.com/api.php) If you do not want to obtain a key, you can use a fake key value below; some of the Event Grid functionality for this microservice may not work correctly.
 
-### Deploying Microservices Using VSTS
+### Deploying Microservices Using Azure Pipelines
 
-When using VSTS to deploy Content Reactor, a release configuration will need to be created for each microservice. The release configurations will need to be set up with the steps outlined in the sections below. Ensure that you also configure VSTS with the correct Azure subscription on each step.
+When using Azure Pipelines to deploy Content Reactor, a release configuration will need to be created for each microservice. The release configurations will need to be set up with the steps outlined in the sections below. Ensure that you also configure Azure Pipelines with the correct Azure subscription on each step.
 
 ### Categories Microservice
 
@@ -326,7 +326,7 @@ Note that for the text microservice there is no worker API, and no Event Grid su
 
 The Azure Functions Proxies app is deployed into its own resource group. It has its own ARM template, which needs to be configured with the names of the front-end APIs for each microservice so that it can handle routing appropriately. It also contains a `proxies.json` file, which is 'compiled' into a `.zip` file in the build steps above.
 
-### Deploying Proxy Using VSTS
+### Deploying Proxy Using Azure Pipelines
 
  1. **Create Resource Name Suffix:** Use the _PowerShell_ task, with the _Script Path_ set to the relative location of the `CreateUniqueResourceNameSuffix.ps1` file, e.g. `$(System.DefaultWorkingDirectory)/Proxy-CI/deploy/CreateUniqueResourceNameSuffix.ps1`.
 
@@ -348,7 +348,7 @@ The Azure Functions Proxies app is deployed into its own resource group. It has 
 
 The web app is deployed into its own resource group. It has its own ARM template which needs to be configured with the Function Proxy App name from the previous step.
 
-### Deploying Web Application Using VSTS
+### Deploying Web Application Using Azure Pipelines
 
  1. **Create Resource Name Suffix:** Use the _PowerShell_ task, with the _Script Path_ set to the relative location of the `CreateUniqueResourceNameSuffix.ps1` file, e.g. `$(System.DefaultWorkingDirectory)/Web-CI/deploy/CreateUniqueResourceNameSuffix.ps1`.
 
