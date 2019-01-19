@@ -31,7 +31,7 @@
         "blobAccountName": "[concat(variables('resourceNamePrefix'), 'blob', parameters('uniqueResourceNameSuffix'))]",
 
         "cognitiveServicesAccountName": "[concat(variables('resourceNamePrefix'), 'cs', parameters('uniqueResourceNameSuffix'))]",
-        "cognitiveServicesApiUrl": "https://speech.platform.bing.com/speech/recognition/interactive/cognitiveservices/v1?language=en-us&format=detailed",
+        "cognitiveServicesApiUrl": "https://westeurope.stt.speech.microsoft.com/speech/recognition/conversation/cognitiveservices/v1&format=detailed",
         
         "eventGridTopicResourceId": "[resourceId(parameters('eventsResourceGroupName'), 'Microsoft.EventGrid/topics', parameters('eventGridTopicName'))]"
     },
