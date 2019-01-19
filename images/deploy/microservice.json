@@ -16,7 +16,7 @@
 
         "applicationInsightsLocation": {
             "type": "string",
-            "defaultValue": "westus2"
+            "defaultValue": "[resourceGroup().location]"
         }
     },
     "variables": {
@@ -117,7 +117,8 @@
                         "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('Microsoft.Insights/components', variables('applicationInsightsName')), '2014-04-01').InstrumentationKey]",
                         "EventGridTopicEndpoint": "[reference(variables('eventGridTopicResourceId'), '2018-01-01').endpoint]",
                         "EventGridTopicKey": "[listKeys(variables('eventGridTopicResourceId'), '2018-01-01').key1]",
-                        "BlobConnectionString": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('blobAccountName'), ';AccountKey=', listKeys(variables('blobAccountName'),'2015-05-01-preview').key1)]"
+                        "BlobConnectionString": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('blobAccountName'), ';AccountKey=', listKeys(variables('blobAccountName'),'2015-05-01-preview').key1)]",
+                        "AzureWebJobsSecretStorageType":"Files"
                     },
                     "dependsOn": [
                         "[resourceId('Microsoft.Web/sites', variables('functionsApiAppName'))]",
@@ -157,7 +158,8 @@
                         "EventGridTopicKey": "[listKeys(variables('eventGridTopicResourceId'), '2018-01-01').key1]",
                         "BlobConnectionString": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('blobAccountName'), ';AccountKey=', listKeys(variables('blobAccountName'),'2015-05-01-preview').key1)]",
                         "CognitiveServicesVisionApiEndpoint": "[reference(variables('cognitiveServicesAccountName'),'2016-02-01-preview').endpoint]",
-                        "CognitiveServicesVisionApiKey": "[listKeys(variables('cognitiveServicesAccountName'),'2016-02-01-preview').key1]"
+                        "CognitiveServicesVisionApiKey": "[listKeys(variables('cognitiveServicesAccountName'),'2016-02-01-preview').key1]",
+                        "AzureWebJobsSecretStorageType":"Files"
                     },
                     "dependsOn": [
                         "[resourceId('Microsoft.Web/sites', variables('functionsWorkerApiAppName'))]",

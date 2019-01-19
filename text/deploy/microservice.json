@@ -16,7 +16,7 @@
 
         "applicationInsightsLocation": {
             "type": "string",
-            "defaultValue": "westus2"
+            "defaultValue": "[resourceGroup().location]"
         }
     },
     "variables": {
@@ -95,7 +95,8 @@
                         "CosmosDBAccountEndpointUrl": "[reference(variables('cosmosDbAccountName')).documentEndpoint]",
                         "CosmosDBAccountKey": "[listKeys(variables('cosmosDbAccountName'), '2015-04-08').primaryMasterKey]",
                         "DatabaseName": "[variables('cosmosDbDatabaseName')]",
-                        "CollectionName": "[variables('cosmosDbCollectionName')]"
+                        "CollectionName": "[variables('cosmosDbCollectionName')]",
+                        "AzureWebJobsSecretStorageType":"Files"
                     },
                     "dependsOn": [
                         "[resourceId('Microsoft.Web/sites', variables('functionsApiAppName'))]",
