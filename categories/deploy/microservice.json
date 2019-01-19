@@ -149,7 +149,8 @@
                         "CognitiveServicesSearchApiEndpoint": "[variables('cognitiveServicesSearchApiUrl')]",
                         "CognitiveServicesSearchApiKey": "[listKeys(variables('cognitiveServicesAccountName'),'2016-02-01-preview').key1]",
                         "BigHugeThesaurusApiEndpoint": "[variables('bigHugeThesaurusApiUrl')]",
-                        "BigHugeThesaurusApiKey": "[parameters('bigHugeThesaurusApiKey')]"
+                        "BigHugeThesaurusApiKey": "[parameters('bigHugeThesaurusApiKey')]",
+                        "AzureWebJobsSecretStorageType":"Files"
                     },
                     "dependsOn": [
                         "[resourceId('Microsoft.Web/sites', variables('functionsWorkerApiAppName'))]",
