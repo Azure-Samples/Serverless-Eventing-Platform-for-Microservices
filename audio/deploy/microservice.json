@@ -16,7 +16,7 @@
 
         "applicationInsightsLocation": {
             "type": "string",
-            "defaultValue": "westus2"
+            "defaultValue": "[resourceGroup().location]"
         }
     },
     "variables": {
