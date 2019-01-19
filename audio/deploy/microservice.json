@@ -184,7 +184,7 @@
             "sku": {
                 "name": "S0"
             },
-            "kind": "Bing.Speech",
+            "kind": "Speech",
             "properties": {}
         }
     ]
