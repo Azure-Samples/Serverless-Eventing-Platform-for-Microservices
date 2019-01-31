@@ -16,7 +16,7 @@
 
         "applicationInsightsLocation": {
             "type": "string",
-            "defaultValue": "westus2"
+            "defaultValue": "[resourceGroup().location]"
         }
     },
     "variables": {
@@ -31,7 +31,7 @@
         "blobAccountName": "[concat(variables('resourceNamePrefix'), 'blob', parameters('uniqueResourceNameSuffix'))]",
 
         "cognitiveServicesAccountName": "[concat(variables('resourceNamePrefix'), 'cs', parameters('uniqueResourceNameSuffix'))]",
-        "cognitiveServicesApiUrl": "https://speech.platform.bing.com/speech/recognition/interactive/cognitiveservices/v1?language=en-us&format=detailed",
+        "cognitiveServicesApiUrl": "https://westeurope.stt.speech.microsoft.com/speech/recognition/conversation/cognitiveservices/v1&format=detailed",
         
         "eventGridTopicResourceId": "[resourceId(parameters('eventsResourceGroupName'), 'Microsoft.EventGrid/topics', parameters('eventGridTopicName'))]"
     },
@@ -119,7 +119,8 @@
                         "CognitiveServicesSpeechApiKey": "[listKeys(variables('cognitiveServicesAccountName'),'2016-02-01-preview').key1]",
                         "EventGridTopicEndpoint": "[reference(variables('eventGridTopicResourceId'), '2018-01-01').endpoint]",
                         "EventGridTopicKey": "[listKeys(variables('eventGridTopicResourceId'), '2018-01-01').key1]",
-                        "BlobConnectionString": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('blobAccountName'), ';AccountKey=', listKeys(variables('blobAccountName'),'2015-05-01-preview').key1)]"
+                        "BlobConnectionString": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('blobAccountName'), ';AccountKey=', listKeys(variables('blobAccountName'),'2015-05-01-preview').key1)]",
+                        "AzureWebJobsSecretStorageType":"Files"
                     },
                     "dependsOn": [
                         "[resourceId('Microsoft.Web/sites', variables('functionsApiAppName'))]",
@@ -159,7 +160,8 @@
                         "CognitiveServicesSpeechApiKey": "[listKeys(variables('cognitiveServicesAccountName'),'2016-02-01-preview').key1]",
                         "EventGridTopicEndpoint": "[reference(variables('eventGridTopicResourceId'), '2018-01-01').endpoint]",
                         "EventGridTopicKey": "[listKeys(variables('eventGridTopicResourceId'), '2018-01-01').key1]",
-                        "BlobConnectionString": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('blobAccountName'), ';AccountKey=', listKeys(variables('blobAccountName'),'2015-05-01-preview').key1)]"
+                        "BlobConnectionString": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('blobAccountName'), ';AccountKey=', listKeys(variables('blobAccountName'),'2015-05-01-preview').key1)]",
+                        "AzureWebJobsSecretStorageType":"Files"
                     },
                     "dependsOn": [
                         "[resourceId('Microsoft.Web/sites', variables('functionsWorkerApiAppName'))]",
@@ -177,12 +179,12 @@
         {
             "name": "[variables('cognitiveServicesAccountName')]",
             "type": "Microsoft.CognitiveServices/accounts",
-            "location": "global",
+            "location": "[resourceGroup().location]",
             "apiVersion": "2016-02-01-preview",
             "sku": {
                 "name": "S0"
             },
-            "kind": "Bing.Speech",
+            "kind": "SpeechServices",
             "properties": {}
         }
     ]

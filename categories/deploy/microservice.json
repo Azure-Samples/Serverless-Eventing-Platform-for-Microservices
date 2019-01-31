@@ -14,11 +14,6 @@
             "type": "string"
         },
 
-        "applicationInsightsLocation": {
-            "type": "string",
-            "defaultValue": "westus2"
-        },
-
         "bigHugeThesaurusApiKey": {
             "type": "string",
             "defaultValue": ""
@@ -48,7 +43,7 @@
             "name": "[variables('applicationInsightsName')]",
             "type": "Microsoft.Insights/components",
             "apiVersion": "2014-04-01",
-            "location": "[parameters('applicationInsightsLocation')]",
+            "location": "[resourceGroup().location]",
             "kind": "other",
             "properties": {
                 "applicationId": "[variables('applicationInsightsName')]"
@@ -109,7 +104,8 @@
                         "CognitiveServicesSearchApiEndpoint": "[variables('cognitiveServicesSearchApiUrl')]",
                         "CognitiveServicesSearchApiKey": "[listKeys(variables('cognitiveServicesAccountName'),'2016-02-01-preview').key1]",
                         "BigHugeThesaurusApiEndpoint": "[variables('bigHugeThesaurusApiUrl')]",
-                        "BigHugeThesaurusApiKey": "[parameters('bigHugeThesaurusApiKey')]"
+                        "BigHugeThesaurusApiKey": "[parameters('bigHugeThesaurusApiKey')]",
+                        "AzureWebJobsSecretStorageType":"Files"
                     },
                     "dependsOn": [
                         "[resourceId('Microsoft.Web/sites', variables('functionsApiAppName'))]",
@@ -153,7 +149,8 @@
                         "CognitiveServicesSearchApiEndpoint": "[variables('cognitiveServicesSearchApiUrl')]",
                         "CognitiveServicesSearchApiKey": "[listKeys(variables('cognitiveServicesAccountName'),'2016-02-01-preview').key1]",
                         "BigHugeThesaurusApiEndpoint": "[variables('bigHugeThesaurusApiUrl')]",
-                        "BigHugeThesaurusApiKey": "[parameters('bigHugeThesaurusApiKey')]"
+                        "BigHugeThesaurusApiKey": "[parameters('bigHugeThesaurusApiKey')]",
+                        "AzureWebJobsSecretStorageType":"Files"
                     },
                     "dependsOn": [
                         "[resourceId('Microsoft.Web/sites', variables('functionsWorkerApiAppName'))]",
