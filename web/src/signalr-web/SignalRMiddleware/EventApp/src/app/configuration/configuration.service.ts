@@ -15,7 +15,7 @@ export class ConfigurationService {
             }, error => console.error(error));
     }
 
-    get apiAddress() {
+    get appInsightsKey() {
         return this.configuration.key;
     }
 
