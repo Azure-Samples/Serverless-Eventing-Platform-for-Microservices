@@ -34,13 +34,17 @@ namespace SignalRMiddleware.Services
         Task<dynamic> ListTextAsync(string userId);
         Task<dynamic> UpdateTextAsync(string userId, string textId,string requestBody);
         Task<dynamic> DeleteTextAsync(string userId, string textId);
+
+        /** ApplicationSetting Interfaces **/
+
+        string GetAppInsightskey();
     }
     public class CRUDService : ICRUDService
     {
         static HttpClient client = new HttpClient();
         const string jsonMimeType = "application/json";
         static string functionsApiProxy = Environment.GetEnvironmentVariable("FUNCTION_API_PROXY_ROOT", EnvironmentVariableTarget.Process);
-
+        
         /** HTTP Methods */
         private static async Task<string> HttpMethodAsync(string verb,string url, HttpContent httpContent)
         {
@@ -204,6 +208,13 @@ namespace SignalRMiddleware.Services
         {
             string url = functionsApiProxy + "/text/" + textId + "/?userId=" + userId;
             return await CRUDService.HttpMethodAsync("DELETE", url, null);
+        }
+
+        /** AppSettings API */
+
+        public string GetAppInsightskey()
+        {
+            return Environment.GetEnvironmentVariable("APPINSIGHTS_INSTRUMENTATIONKEY") ?? "NOKEYAVAILABLE";
         }
     }
 }
