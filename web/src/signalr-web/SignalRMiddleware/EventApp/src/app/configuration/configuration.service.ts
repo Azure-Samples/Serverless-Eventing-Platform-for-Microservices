@@ -5,10 +5,11 @@ import { HttpClient } from '@angular/common/http';
 export class ConfigurationService {
 
     private configuration: IAppInsightsConfiguration;
+    
     constructor(private http: HttpClient) { }
 
     loadConfig() {
-        return this.http.get<IAppInsightsConfiguration>('/api/applicationsetting')
+        return this.http.get<IAppInsightsConfiguration>('https://crwebsssrtmrepszkp.azurewebsites.net/api/applicationsetting')
             .toPromise()
             .then(result => {
                 this.configuration = <IAppInsightsConfiguration>(result);
