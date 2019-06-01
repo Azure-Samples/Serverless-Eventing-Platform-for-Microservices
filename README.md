@@ -13,7 +13,7 @@ The application itself is a personal knowledge management system, and it allows 
 The sample can be built and run by following the instructions in the [`setup.md` file](setup.md).
 
 
-# Microservices-Test
+# Microservices
 
 The back-end components of this sample are written as microservices. Microservice architectures have the benefit that complex systems can be be decomposed into modular, granular, independently written and deployable pieces. Each microservice has a defined domain of responsibility, and can be designed and written using appropriate technologies and architectural patterns that make sense for that particular domain. In a large organisation, different teams may be responsible for different microservices, allowing for each microservice to be built in parallel.
 

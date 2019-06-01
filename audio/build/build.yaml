@@ -21,7 +21,7 @@ steps:
       command: "publish"
       publishWebProjects: "False"
       projects: "audio/src/**/*Api.csproj"
-      arguments: "--configuration Debug --output $(build.artifactstagingdirectory)"
+      arguments: "--output $(build.artifactstagingdirectory)"
       zipAfterPublish: "True"
 
   # Run Unit Tests
