@@ -9,7 +9,8 @@ export class ConfigurationService {
     constructor(private http: HttpClient) { }
 
     loadConfig() {
-        return this.http.get<IAppInsightsConfiguration>('https://crwebsssrtmrepszkp.azurewebsites.net/api/applicationsetting')
+        var appsetting_get_url = location.origin + "/api/applicationsetting";
+        return this.http.get<IAppInsightsConfiguration>(appsetting_get_url)
             .toPromise()
             .then(result => {
                 this.configuration = <IAppInsightsConfiguration>(result);
