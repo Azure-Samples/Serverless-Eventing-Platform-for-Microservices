@@ -27,7 +27,7 @@ namespace ContentReactor.Images.Services
         {
             HttpClient.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", CognitiveServicesVisionApiKey);
             
-            var uri = CognitiveServicesVisionApiEndpoint + "/analyze?visualFeatures=Description&language=en";
+            var uri = CognitiveServicesVisionApiEndpoint + "vision/v1.0/analyze?visualFeatures=Description&language=en";
             
             using (var content = new ByteArrayContent(imageBytes))
             {

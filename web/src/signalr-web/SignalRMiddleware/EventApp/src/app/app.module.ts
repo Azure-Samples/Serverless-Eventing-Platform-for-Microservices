@@ -12,6 +12,8 @@ import { DataService } from './services/data.service';
 import { HubService } from './services/hub.service'
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { AppInsightsService } from './services/app-insights.service';
+import { APP_INITIALIZER } from '@angular/core';
+import { ConfigurationService } from "./configuration/configuration.service";
 
 const appRoutes: Routes = [
   {
@@ -24,6 +26,12 @@ const appRoutes: Routes = [
     path: 'items', component: ItemComponent
   }
 ]
+
+const appInitializerFn = (appConfig: ConfigurationService) => {
+  return () => {
+    return appConfig.loadConfig();
+  };
+};
 
 @NgModule({
   
@@ -38,7 +46,14 @@ const appRoutes: Routes = [
     NgbModule.forRoot(),
     RouterModule.forRoot(appRoutes, {enableTracing: true})
   ],
-  providers: [DataService, HubService, AppInsightsService],
+  providers: [DataService, HubService, AppInsightsService,ConfigurationService,
+    {
+      provide: APP_INITIALIZER,
+      useFactory: appInitializerFn,
+      multi: true,
+      deps: [ConfigurationService]
+    }],
   bootstrap: [AppComponent]
+  
 })
 export class AppModule { }

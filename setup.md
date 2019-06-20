@@ -146,13 +146,13 @@ When using Azure Pipelines to deploy Content Reactor, a release configuration wi
 
  4. **Create Cosmos DB Collection:** Use the _Azure CLI_ task, with the _Inline Script_ set to:
 
-    `az cosmosdb collection create --name crcatdb$(UniqueResourceNameSuffix) --db-name Categories --collection-name Categories --resource-group ContentReactor-Categories --partition-key-path "/userId" --throughput 1000 & exit 0`
+    `az cosmosdb collection create --name crcatdb$(UniqueResourceNameSuffix) --db-name Categories --collection-name Categories --resource-group ContentReactor-Categories --partition-key-path "/userId" --throughput 400 & exit 0`
 
  5. **Deploy API:** Use the _Azure App Service Deploy_ task, with the _App type_ set to `Function app`. Set the _App Service name_ to `crcatapi$(UniqueResourceNameSuffix)`. Set the _Package or folder_ to the relative location of the `.zip` file for the front-end API, e.g. `$(System.DefaultWorkingDirectory)/Categories-CI/functions/ContentReactor.Categories.Api.zip`.
 
  6. **Deploy Worker API:** Use the _Azure App Service Deploy_ task, with the _App type_ set to `Function app`. Set the _App Service name_ to `crcatwapi$(UniqueResourceNameSuffix)`. Set the _Package or folder_ to the relative location of the `.zip` file for the worker API, e.g. `$(System.DefaultWorkingDirectory)/Categories-CI/functions/ContentReactor.Categories.WorkerApi.zip`.
 
- 7. **Deploy Event Subscriptions ARM Template:** Use the _Azure Resource Group Deployment_ task, with the _Action_ set to `Create or update resource group`. Set the _Template_ to the location of the `eventGridSubscriptions.json` file, e.g. `$(System.DefaultWorkingDirectory)/Categories-CI/deploy/eventGridSubscriptions.json`. Set the _Overridable template parameters_ to the following: `-eventGridTopicName {event-grid-topic-name} -microserviceResourceGroupName ContentReactor-Categories -microserviceFunctionsWorkerApiAppName {worker-api-function-app-name}`
+ 7. **Deploy Event Subscriptions ARM Template:** Use the _Azure Resource Group Deployment_ task, with the _Action_ set to `Create or update resource group`. Set the name of the Resource Group to the one hosting the _EventGrid_ Resource. Set the _Template_ to the location of the `eventGridSubscriptions.json` file, e.g. `$(System.DefaultWorkingDirectory)/Categories-CI/deploy/eventGridSubscriptions.json`. Set the _Overridable template parameters_ to the following: `-eventGridTopicName {event-grid-topic-name} -microserviceResourceGroupName ContentReactor-Categories -microserviceFunctionsWorkerApiAppName {worker-api-function-app-name}`
 
 ### Text Microservice
 
@@ -198,7 +198,7 @@ Note that for the text microservice there is no worker API, and no Event Grid su
 
  8. **Deploy Worker API:** Use the _Azure App Service Deploy_ task, with the _App type_ set to `Function app`. Set the _App Service name_ to `crimgwapi$(UniqueResourceNameSuffix)`. Set the _Package or folder_ to the relative location of the `.zip` file for the worker API, e.g. `$(System.DefaultWorkingDirectory)/Images-CI/functions/ContentReactor.Images.WorkerApi.zip`.
 
- 9. **Deploy Event Subscriptions ARM Template:** Use the _Azure Resource Group Deployment_ task, with the _Action_ set to `Create or update resource group`. Set the _Template_ to the location of the `eventGridSubscriptions.json` file, e.g. `$(System.DefaultWorkingDirectory)/Images-CI/deploy/eventGridSubscriptions.json`. Set the _Overridable template parameters_ to the following: `-eventGridTopicName {event-grid-topic-name} -microserviceResourceGroupName ContentReactor-Images -microserviceFunctionsWorkerApiAppName {worker-api-function-app-name}`
+ 9. **Deploy Event Subscriptions ARM Template:** Use the _Azure Resource Group Deployment_ task, with the _Action_ set to `Create or update resource group`.Set the name of the Resource Group to the one hosting the _EventGrid_ Resource. Set the _Template_ to the location of the `eventGridSubscriptions.json` file, e.g. `$(System.DefaultWorkingDirectory)/Images-CI/deploy/eventGridSubscriptions.json`. Set the _Overridable template parameters_ to the following: `-eventGridTopicName {event-grid-topic-name} -microserviceResourceGroupName ContentReactor-Images -microserviceFunctionsWorkerApiAppName {worker-api-function-app-name}`
 
 ### Audio Microservice
 
@@ -222,7 +222,7 @@ Note that for the text microservice there is no worker API, and no Event Grid su
 
  7. **Deploy Worker API:** Use the _Azure App Service Deploy_ task, with the _App type_ set to `Function app`. Set the _App Service name_ to `craudwapi$(UniqueResourceNameSuffix)`. Set the _Package or folder_ to the relative location of the `.zip` file for the worker API, e.g. `$(System.DefaultWorkingDirectory)/Audio-CI/functions/ContentReactor.Audio.WorkerApi.zip`.
 
- 8. **Deploy Event Subscriptions ARM Template:** Use the _Azure Resource Group Deployment_ task, with the _Action_ set to `Create or update resource group`. Set the _Template_ to the location of the `eventGridSubscriptions.json` file, e.g. `$(System.DefaultWorkingDirectory)/Audio-CI/deploy/eventGridSubscriptions.json`. Set the _Overridable template parameters_ to the following: `-eventGridTopicName {event-grid-topic-name} -microserviceResourceGroupName ContentReactor-Audio -microserviceFunctionsWorkerApiAppName {worker-api-function-app-name}`
+ 8. **Deploy Event Subscriptions ARM Template:** Use the _Azure Resource Group Deployment_ task, with the _Action_ set to `Create or update resource group`.Set the name of the Resource Group to the one hosting the _EventGrid_ Resource. Set the _Template_ to the location of the `eventGridSubscriptions.json` file, e.g. `$(System.DefaultWorkingDirectory)/Audio-CI/deploy/eventGridSubscriptions.json`. Set the _Overridable template parameters_ to the following: `-eventGridTopicName {event-grid-topic-name} -microserviceResourceGroupName ContentReactor-Audio -microserviceFunctionsWorkerApiAppName {worker-api-function-app-name}`
 
 ### Deploying Microservices Manually
 
@@ -356,7 +356,7 @@ The web app is deployed into its own resource group. It has its own ARM template
 
  3. **Deploy API:** Use the _Azure App Service Deploy_ task, with the _App type_ set to `Web App`. Set the _App Service name_ to `crweb$(UniqueResourceNameSuffix)`. Set the _Package or folder_ to the relative location of the `.zip` file for the front-end API, e.g. `$(System.DefaultWorkingDirectory)/Web-CI/webapp/*.zip`.
 
- 4. **Deploy Event Subscriptions ARM Template:** Use the _Azure Resource Group Deployment_ task, with the _Action_ set to `Create or update resource group`. Set the _Template_ to the location of the `eventGridSubscriptions.json` file, e.g. `$(System.DefaultWorkingDirectory)/web/deploy/eventGridSubscriptions.json`. Set the _Overridable template parameters_ to the following: `eventGridTopicName={event-grid-topic-name}  appServiceName={app-service-name}`
+ 4. **Deploy Event Subscriptions ARM Template:** Use the _Azure Resource Group Deployment_ task, with the _Action_ set to `Create or update resource group`.Set the name of the Resource Group to the one hosting the _EventGrid_ Resource. Set the _Template_ to the location of the `eventGridSubscriptions.json` file, e.g. `$(System.DefaultWorkingDirectory)/web/deploy/eventGridSubscriptions.json`. Set the _Overridable template parameters_ to the following: `eventGridTopicName={event-grid-topic-name}  appServiceName={app-service-name}`
 
 ### Deploying Web Application Manually
 
