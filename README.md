@@ -8,7 +8,7 @@ languages:
 - javascript
 products:
 - azure
-description: "In this sample, we have built four microservices that use an Event Grid custom topic for inter-service eventing, and a front-end Angular.js app that uses SignalR to forward Event Grid events to the user interface in real time."
+description: "In this sample, we have built four microservices that use an Event Grid custom topic for inter-service eventing,"
 urlFragment: Serverless-Eventing-Platform-for-Microservices
 ---
 
