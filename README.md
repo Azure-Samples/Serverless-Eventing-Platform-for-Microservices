@@ -21,7 +21,7 @@ The application itself is a personal knowledge management system, and it allows 
 The sample can be built and run by following the instructions in the [`setup.md` file](setup.md).
 
 
-# Microservices
+## Microservices
 
 The back-end components of this sample are written as microservices. Microservice architectures have the benefit that complex systems can be be decomposed into modular, granular, independently written and deployable pieces. Each microservice has a defined domain of responsibility, and can be designed and written using appropriate technologies and architectural patterns that make sense for that particular domain. In a large organisation, different teams may be responsible for different microservices, allowing for each microservice to be built in parallel.
 
@@ -36,7 +36,7 @@ Microservice architectures have a number of characteristics, including:
 
 More information on the overall philosophy behind microservices is available from [Sam Newman's _Principles of Microservices_ talk](https://samnewman.io/talks/principles-of-microservices/).
 
-## Communication Between Microservices
+### Communication Between Microservices
 
 A key tenet of microservice architecture is that microservices are **loosely coupled**. While microservices can communicate together, communication should be fairly lightweight and should be conducted in a well-defined manner. If *synchronous (real-time) communication* is necessary then it should take place through well-known, published APIs and should not involve direct remote procedure calls or direct access to data stores or internal components of the microservice. Where possible, asynchronous communication should be used to choreograph multiple microservices.
 
@@ -45,7 +45,7 @@ A key tenet of microservice architecture is that microservices are **loosely cou
 Event Grid allows for events to be published to a common store (*topic*), and distributed to any interested parties (*subscribers*) who may need to know about the events. Communication - both publishing and subscribing - occurs using HTTP, which means that Event Grid messages can be published and consumed by clients on virtually any platform, including on Azure Functions. Events contain a common set of metadata as well as any custom data relevant to the business domain, and Event Grid provides the ability to apply filters to subscriptions so that only relevant events are forwarded to each microservice. Finally, as a managed service, Event Grid provides a strong SLA and automatically handles data integrity as well as retries failed deliveries.
 
 
-# Sample Architecture
+## Sample Architecture
 
 The sample contains four microservices, each with defined responsibilities: one for managing categories, one for audio notes, one for image notes, and one for text notes. The microservices each contain:
  * A front-end API for users to manage their data, built on Azure Functions and using many RESTful design principles;
@@ -63,15 +63,15 @@ The sample also contains an Angular.js application that is bundled within an ASP
 Each microservice and other components within the sample are designed to be built and deployed in a fully automated manner. We used Azure DevOps, although any other build and release management systems could also be used. We used [Azure DevOps's Build YAML](https://docs.microsoft.com/en-us/azure/devops/pipelines/get-started-yaml?view=vsts) feature to declaratively specify our build process and used [Azure DevOps Release Management](https://docs.microsoft.com/en-us/azure/devops/pipelines/release/what-is-release-management?view=vsts) to define our release process and publish the built components to Azure. Please see the `setup.md` file for more information on how to build and release the sample components for yourself.
 
 
-# Components
+## Components
 
-## Event Grid Topic
+### Event Grid Topic
 
 [Event Grid](https://docs.microsoft.com/en-us/azure/event-grid/) is the messaging technology used by the microservices for orchestration. Each microservice publishes events onto an [Event Grid custom topic](https://docs.microsoft.com/en-us/azure/event-grid/post-to-custom-topic). Microservices, and the front end components, subscribe to this Event Grid custom topic and perform their own business logic based on the events they process.
 
 In this sample, the Event Grid custom topic is in its own resource group, `ContentReactor-Events`.
 
-## Categories Microservice
+### Categories Microservice
 
 The categories microservice is responsible for tracking the categories that notes are placed in, as well as providing an index of the notes within each category. The microservice provides an API for creating and managing categories, and the category data is stored within a Cosmos DB collection.
 
@@ -83,7 +83,7 @@ The categories microservice maintains a preview for each note. For image notes, 
 
 The categories microservice components are in a resource group named `ContentReactor-Categories`.
 
-## Images Microservice
+### Images Microservice
 
 The images microservice maintains the image notes that a user creates. Images up to 4MB in size can be uploaded to the microservice's API. The images microservice takes responsibility for creating a small preview of the image, and for obtaining a description of the image from Azure Cognitive Services. Images are stored within an Azure Storage blob collection.
 
@@ -93,7 +93,7 @@ When images are updated (e.g. when the caption is updated) or deleted, the micro
 
 The images microservice components are in a resource group named `ContentReactor-Images`.
 
-## Audio Microservice
+### Audio Microservice
 
 The audio microservice maintains the audio notes that a user creates. Short audio files of less than 15 seconds duration can be uploaded to the microservice's API. The audio microservice stores the files within an Azure Storage blob collection and then takes responsibility for transcribing the audio to text.
 
@@ -103,7 +103,7 @@ When audio files are uploaded (i.e. when the transcript is updated) or deleted, 
 
 The audio microservice components are in a resource group named `ContentReactor-Audio`.
 
-## Text Microservice
+### Text Microservice
 
 The text microservice maintains the text notes that a user creates. Text can be uploaded to the microservice's API, and the microservice stores it in a Cosmos DB collection.
 
@@ -113,11 +113,11 @@ When text notes are updated or deleted, the microservice publishes events that a
 
 The audio microservice components are in a resource group named `ContentReactor-Text`.
 
-## Proxies
+### Proxies
 
 Each of the microservices presents a public-facing API for working with the resources they manage. In keeping with best practices for exposing multiple microservice-hosted APIs, the sample includes an API proxy that presents the four APIs at a single hostname. This simplifies the client side, ensuring it only has to know about a single base URL. The API proxy is built using [Azure Functions Proxies](https://docs.microsoft.com/en-us/azure/azure-functions/functions-proxies).
 
-## Front-End
+### Front-End
 
 The front-end is built as an Angular application that is bundled inside an ASP.NET web app. The ASP.NET web app plays the following roles:
 
@@ -144,7 +144,7 @@ The `app.module.ts` file bootstraps the application.
 
 Note: The front end is not optimized for mobile browsers.
 
-## Middleware
+### Middleware
 
 The front-end and the Azure Functions/Event Grid backend are connected by ASP.NET middleware that uses the latest [preview version of .NET Core](https://blogs.msdn.microsoft.com/webdev/2018/02/27/asp-net-core-2-1-0-preview1-using-asp-net-core-previews-on-azure-app-service/).
 
@@ -160,7 +160,7 @@ Note:
 *	The ASP.NET SignalR component is wired for bidirectional communication. The front-end-to-backend call is designed as a typical controller API call, but it is also possible to invoke the backend directly via SignalR.
 * The front end/middleware and backend can be substituted with other frameworks. For example, React.js/Socket.io and Node.js can also be a combination respectively.
 
-# User Authentication and Authorization
+## User Authentication and Authorization
 
 This sample allows for multiple users to store and retrieve notes. Each microservice is responsible for using the appropriate tools at its disposal for ensuring separation between users; the categories and text microservices use [Cosmos DB's partitioned collections](https://docs.microsoft.com/en-us/azure/cosmos-db/partition-data) feature to store each user's data on a separate partition, while the images and audio microservices use [Azure Storage's](https://docs.microsoft.com/en-us/azure/storage/) blob folders to achieve a similar goal. The front-end APIs on each microservice accept the user's ID in their query strings and perform operations on the data in the context of that user.
 
@@ -168,7 +168,7 @@ We have not implemented a user management system, nor any form of true authentic
 
 While it's out of the scope of this sample, it would certainly be possible to build authentication and user identity handling into the system. There are a number of approaches that could be used including adding federated identity and using Azure AD B2C.
 
-## Approach 1: Federated Identity
+### Approach 1: Federated Identity
 
 A number of public identity providers, such as Facebook, Twitter, Google, or Microsoft's Live ID, can be used to provide identity services to the Content Reactor system. In general, the following steps could be followed to use this type of federated identity approach:
 
@@ -177,7 +177,7 @@ A number of public identity providers, such as Facebook, Twitter, Google, or Mic
  3. Set up each microservice's front-end API Functions app to check for authorization. [This blog post](https://blogs.msdn.microsoft.com/stuartleeks/2018/02/19/azure-functions-and-app-service-authentication/) provides some helpful advice on how to authenticate tokens from within an Azure Functions app.
  4. Update each microservice's front-end API Functions app to use the subject ID or a user ID claim as the user ID within the Content Reactor system, and remove the `userId` query string parameter from each API operation.
 
-## Approach 2: Azure AD B2C
+### Approach 2: Azure AD B2C
 
 [Azure AD B2C](https://docs.microsoft.com/en-us/azure/active-directory-b2c/) is a fully managed identity system for consumer-facing apps. It uses open standards, including JSON Web Tokens (JWTs) and OpenID Connect, allowing for interoperability across a range of client and server platforms. It also provides additional features including federation with other identity providers, and advanced policies and claims.
 
@@ -190,7 +190,7 @@ Integrating Content Reactor with Azure AD B2C is conceptually similar to working
  5. Update each microservice's front-end API Functions app to use the subject ID or a user ID claim as the user ID within the Content Reactor system, and remove the `userId` query string parameter from each API operation.
 
 
-# Event Types Reference
+## Event Types Reference
 
 | Event Type              | Publisher               | Published When                                                                                                                                         | Microservice Subscribers                                                                                                                    |
 |-------------------------|-------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------|
@@ -211,13 +211,13 @@ Integrating Content Reactor with Azure AD B2C is conceptually similar to working
 | TextUpdated             | Text microservice       | Whenever the contents of a text note has been changed                                                                                                  |                                                                                                                                             |
 
 
-# Sample Requests
+## Sample Requests
 
 Note that these sample requests use the hostname `crprodapiproxy.azurewebsites.net`. You should replace this with your proxy app's hostname.
 
-## Categories Microservice's API
+### Categories Microservice's API
 
-### Create Category
+#### Create Category
 
 ```
 POST https://crprodapiproxy.azurewebsites.net/api/categories?userId={userId} HTTP/1.1
@@ -229,7 +229,7 @@ POST https://crprodapiproxy.azurewebsites.net/api/categories?userId={userId} HTT
 
 Should return an HTTP 200 OK with an ‘id’.
 
-### Get Category
+#### Get Category
 
 ```
 GET https://crprodapiproxy.azurewebsites.net/api/categories/{categoryId}?userId={userId} HTTP/1.1
@@ -237,7 +237,7 @@ GET https://crprodapiproxy.azurewebsites.net/api/categories/{categoryId}?userId=
 
 Should return an HTTP 200 OK with the category details, including (after a short period of time) the image URL and synonyms, and any items added to the category.
 
-### List Categories for User
+#### List Categories for User
 
 ```
 GET https://crprodapiproxy.azurewebsites.net/api/categories?userId={userId} HTTP/1.1
@@ -245,7 +245,7 @@ GET https://crprodapiproxy.azurewebsites.net/api/categories?userId={userId} HTTP
 
 Should return an HTTP 200 OK with the category summary – the name and ID of the category.
 
-### Update Category Name
+#### Update Category Name
 
 ```
 PATCH https://crprodapiproxy.azurewebsites.net/api/categories/{categoryId}?userId={userId} HTTP/1.1
@@ -257,7 +257,7 @@ PATCH https://crprodapiproxy.azurewebsites.net/api/categories/{categoryId}?userI
 
 Should return an HTTP 204 No Content.
 
-### Delete Category
+#### Delete Category
 
 ```
 DELETE https://crprodapiproxy.azurewebsites.net/api/categories/{categoryId}?userId={userId} HTTP/1.1
@@ -266,9 +266,9 @@ DELETE https://crprodapiproxy.azurewebsites.net/api/categories/{categoryId}?user
 Should return an HTTP 204 No Content.
 
 
-## Audio Microservice's API
+### Audio Microservice's API
 
-### Create Audio Note
+#### Create Audio Note
 
 Note that creating an audio note is done in three parts. First, the client should issue a request to the `audio` API without a payload:
 
@@ -292,7 +292,7 @@ POST https://crprodapiproxy.azurewebsites.net/audio/{audioId}?userId={userId} HT
 
 The `id` parameter they obtained should be included in the URL, and they should also include the ID for the category that this note should be placed into. Should return an HTTP 204 No Content.
 
-### Get Audio Note
+#### Get Audio Note
 
 ```
 GET https://crprodapiproxy.azurewebsites.net/audio/{audioId}?userId={userId} HTTP/1.1
@@ -300,7 +300,7 @@ GET https://crprodapiproxy.azurewebsites.net/audio/{audioId}?userId={userId} HTT
 
 Should return an HTTP 200 OK with the audio note details, including the audio file's URL, and (after a short time) the transcript. The URL includes a time-limited SAS token allowing the client to read the blob.
 
-### List Audio Notes for User
+#### List Audio Notes for User
 
 ```
 GET https://crprodapiproxy.azurewebsites.net/audio?userId={userId} HTTP/1.1
@@ -308,7 +308,7 @@ GET https://crprodapiproxy.azurewebsites.net/audio?userId={userId} HTTP/1.1
 
 Should return an HTTP 200 OK with the audio notes summary – the ID of each audio note and preview of its transcript, if known.
 
-### Delete Audio Note
+#### Delete Audio Note
 
 ```
 DELETE https://crprodapiproxy.azurewebsites.net/audio/{audioId}?userId={userId} HTTP/1.1
@@ -317,9 +317,9 @@ DELETE https://crprodapiproxy.azurewebsites.net/audio/{audioId}?userId={userId} 
 Should return an HTTP 204 No Content.
 
 
-## Images Microservice's API
+### Images Microservice's API
 
-### Create Image Note
+#### Create Image Note
 
 Note that creating an image note is done in three parts. First, the client should issue a request to the `images` API without a payload:
 
@@ -343,7 +343,7 @@ POST https://crprodapiproxy.azurewebsites.net/images/{imageId}?userId={userId} H
 
 The `id` parameter they obtained should be included in the URL, and they should also include the ID for the category that this note should be placed into. Should return an HTTP 200 OK with the preview URL included.
 
-### Get Image Note
+#### Get Image Note
 
 ```
 GET https://crprodapiproxy.azurewebsites.net/images/{imageId}?userId={userId} HTTP/1.1
@@ -351,7 +351,7 @@ GET https://crprodapiproxy.azurewebsites.net/images/{imageId}?userId={userId} HT
 
 Should return an HTTP 200 OK with the image note details, including the full-size image URL and preview URL, and (after a short time) the image caption. The URLs include a time-limited SAS token allowing the client to read the blob.
 
-### List Image Notes for User
+#### List Image Notes for User
 
 ```
 GET https://crprodapiproxy.azurewebsites.net/images?userId={userId} HTTP/1.1
@@ -359,7 +359,7 @@ GET https://crprodapiproxy.azurewebsites.net/images?userId={userId} HTTP/1.1
 
 Should return an HTTP 200 OK with the image notes summary – the ID of each image note and preview of the caption, if known.
 
-### Delete Image Note
+#### Delete Image Note
 
 ```
 DELETE https://crprodapiproxy.azurewebsites.net/images/{imageId}?userId={userId} HTTP/1.1
@@ -368,9 +368,9 @@ DELETE https://crprodapiproxy.azurewebsites.net/images/{imageId}?userId={userId}
 Should return an HTTP 204 No Content.
 
 
-## Text Microservice's API
+### Text Microservice's API
 
-### Create Text Note
+#### Create Text Note
 
 ```
 POST https://crprodapiproxy.azurewebsites.net/text?userId={userId} HTTP/1.1 
@@ -383,7 +383,7 @@ POST https://crprodapiproxy.azurewebsites.net/text?userId={userId} HTTP/1.1
 
 Should return an HTTP 200 OK with the text note's ID.
 
-### Get Text Note
+#### Get Text Note
 
 ```
 GET https://crprodapiproxy.azurewebsites.net/text/{textId}?userId={userId} HTTP/1.1
@@ -391,7 +391,7 @@ GET https://crprodapiproxy.azurewebsites.net/text/{textId}?userId={userId} HTTP/
 
 Should return an HTTP 200 OK with the text note details, including the full text content.
 
-### List Text Notes for User
+#### List Text Notes for User
 
 ```
 GET https://crprodapiproxy.azurewebsites.net/text?userId={userId} HTTP/1.1
@@ -399,7 +399,7 @@ GET https://crprodapiproxy.azurewebsites.net/text?userId={userId} HTTP/1.1
 
 Should return an HTTP 200 OK with the text notes summary – the ID of each text note and the first 100 characters.
 
-### Update Text Note
+#### Update Text Note
 
 Note that the text microservice is the only one that provides an update API endpoint.
 
@@ -415,7 +415,7 @@ PATCH https://crprodapiproxy.azurewebsites.net/text/{textId}?userId={userId} HTT
 
 Should return an HTTP 204 No Content.
 
-### Delete Text Note
+#### Delete Text Note
 
 ```
 DELETE https://crprodapiproxy.azurewebsites.net/text/{textId}?userId={userId} HTTP/1.1
@@ -423,70 +423,70 @@ DELETE https://crprodapiproxy.azurewebsites.net/text/{textId}?userId={userId} HT
 
 Should return an HTTP 204 No Content.
 
-# UI Screenshots
+## UI Screenshots
 
 Here are some sample screenshots from the front end that covers all scenarios and most screens.
 
-## Login Screen
+### Login Screen
 
 ![Screen 1](/_docs/screens/screen1.png)
 
-## Category CRUD screens
+### Category CRUD screens
 
-### Category Create
+#### Category Create
 
 ![Screen 3](/_docs/screens/screen3.png)
 
-### Category Image/Synonym Update Event
+#### Category Image/Synonym Update Event
 
 ![Screen 4](/_docs/screens/screen4.png)
 
-### Category Name Update and Image change notification
+#### Category Name Update and Image change notification
 
 ![Screen 5](/_docs/screens/screen5.png)
 
-## Image CRUD and notification screens
+### Image CRUD and notification screens
 
-### Image Create
+#### Image Create
 
 ![Screen 6](/_docs/screens/screen6.png)
 
-### Image Caption Updated through Event Grid notification 
+#### Image Caption Updated through Event Grid notification 
 
 ![Screen 7](/_docs/screens/screen7.png)
 
 ![Screen 11](/_docs/screens/screen11.png)
 
 
-## Text CRUD and notification screens
+### Text CRUD and notification screens
 
-### Text Note create
+#### Text Note create
 
 ![Screen 8](/_docs/screens/screen8.png)
 
-### Text Note show
+#### Text Note show
 
 ![Screen 10](/_docs/screens/screen10.png)
 
-## Audio CRUD and notification screens
+### Audio CRUD and notification screens
 
-### Audio create
+#### Audio create
 
 ![Screen 12](/_docs/screens/screen12.png)
 
-### Audio processing
+#### Audio processing
 
 ![Screen 13](/_docs/screens/screen13.png)
 
-### Audio transcript event grid notification
+#### Audio transcript event grid notification
 
 ![Screen 14](/_docs/screens/screen14.png)
 
-### Audio show 
+#### Audio show 
 
 ![Screen 15](/_docs/screens/screen15.png)
 
-## Events at category level
+### Events at category level
 
 Events are displayed as notifications against a category.
 
