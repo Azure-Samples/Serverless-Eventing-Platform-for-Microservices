@@ -1,14 +1,18 @@
-﻿using System;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Azure.Storage.Blobs;
+using Azure.Storage.Blobs.Specialized;
+using Azure.Storage.Sas;
 using ContentReactor.Images.Services.Models.Responses;
 using ContentReactor.Images.Services.Models.Results;
 using ContentReactor.Shared;
 using ContentReactor.Shared.BlobRepository;
 using ContentReactor.Shared.EventSchemas.Images;
-using Microsoft.WindowsAzure.Storage.Blob;
 using SixLabors.ImageSharp;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace ContentReactor.Images.Services
 {
@@ -36,7 +40,7 @@ namespace ContentReactor.Images.Services
         protected internal const string CategoryIdMetadataName = "categoryId";
         protected internal const string UserIdMetadataName = "userId";
         protected internal const long MaximumImageSize = 4L * 1024L * 1024L;
-        
+
         public ImagesService(IBlobRepository blobRepository, IImageValidatorService imageValidatorService, IImagePreviewService imagePreviewService, IImageCaptionService imageCaptionService, IEventGridPublisherService eventGridPublisherService)
         {
             BlobRepository = blobRepository;
@@ -52,30 +56,32 @@ namespace ContentReactor.Images.Services
             var imageId = Guid.NewGuid().ToString();
 
             // create a blob placeholder (which will not have any contents yet)
-            var blob = BlobRepository.CreatePlaceholderBlob(FullImagesBlobContainerName, userId, imageId);
+            var blob = BlobRepository.CreatePlaceholderBlob(FullImagesBlobContainerName, imageId);
 
             // get a SAS token to allow the client to write the blob
-            var writePolicy = new SharedAccessBlobPolicy
+            BlobSasBuilder blobSasBuilder = new BlobSasBuilder
             {
-                SharedAccessStartTime = DateTime.UtcNow.AddMinutes(-5), // to allow for clock skew
-                SharedAccessExpiryTime = DateTime.UtcNow.AddHours(24),
-                Permissions = SharedAccessBlobPermissions.Create | SharedAccessBlobPermissions.Write
+                StartsOn = DateTime.UtcNow.AddMinutes(-5),
+                ExpiresOn = DateTime.UtcNow.AddHours(24),
             };
-            var url = BlobRepository.GetSasTokenForBlob(blob, writePolicy);
+
+            blobSasBuilder.SetPermissions(BlobSasPermissions.Create | BlobSasPermissions.Write);
+
+            var url = BlobRepository.GetSasTokenForBlob(blob, blobSasBuilder);
 
             return (imageId, url);
         }
 
         public async Task<(CompleteAddImageNoteResult result, string previewUri)> CompleteAddImageNoteAsync(string imageId, string userId, string categoryId)
         {
-            var imageBlob = await BlobRepository.GetBlobAsync(FullImagesBlobContainerName, userId, imageId, true);
+            var imageBlob = await BlobRepository.GetBlobAsync(FullImagesBlobContainerName, imageId);
             if (imageBlob == null || !await BlobRepository.BlobExistsAsync(imageBlob))
             {
                 // the blob hasn't actually been uploaded yet, so we can't process it
                 return (CompleteAddImageNoteResult.ImageNotUploaded, null);
             }
 
-            using (var rawImage = new MemoryStream(imageBlob.StreamWriteSizeInBytes))
+            using (var rawImage = new MemoryStream())
             {
                 // get the image that was uploaded by the client
                 await BlobRepository.DownloadBlobAsync(imageBlob, rawImage);
@@ -85,7 +91,8 @@ namespace ContentReactor.Images.Services
                 }
 
                 // if the blob already contains metadata then that means it has already been added
-                if (imageBlob.Metadata.ContainsKey(CategoryIdMetadataName))
+                var response = await imageBlob.GetPropertiesAsync();
+                if (response.Value.Metadata.ContainsKey(CategoryIdMetadataName))
                 {
                     return (CompleteAddImageNoteResult.ImageAlreadyCreated, null);
                 }
@@ -97,8 +104,8 @@ namespace ContentReactor.Images.Services
                 }
 
                 // validate the image is in an acceptable format
-                var validationResult = ImageValidatorService.ValidateImage(rawImage);
-                if (!validationResult.isValid)
+                var (isValid, mimeType) = ImageValidatorService.ValidateImage(rawImage);
+                if (!isValid)
                 {
                     return (CompleteAddImageNoteResult.InvalidImage, null);
                 }
@@ -108,30 +115,36 @@ namespace ContentReactor.Images.Services
                 }
 
                 // set the blob metadata
-                imageBlob.Metadata.Add(CategoryIdMetadataName, categoryId);
-                imageBlob.Metadata.Add(UserIdMetadataName, userId);
-                imageBlob.Properties.ContentType = validationResult.mimeType; // the actual detected content type, regardless of what the client may have told us when it uploaded the blob
-                await BlobRepository.UpdateBlobMetadataAsync(imageBlob);
+                var metaData = new Dictionary<string, string>
+                {
+                    {CategoryIdMetadataName,categoryId },
+                    { UserIdMetadataName,userId},
+                };
+
+                //imageBlob.Properties.ContentType = mimeType; // the actual detected content type, regardless of what the client may have told us when it uploaded the blob
+                await BlobRepository.UpdateBlobMetadataAsync(imageBlob, metaData);
 
                 // create and upload a preview image for this blob
-                CloudBlockBlob previewImageBlob;
+                BlockBlobClient previewImageBlob;
                 using (var previewImageStream = ImagePreviewService.CreatePreviewImage(rawImage))
                 {
-                    previewImageBlob = await BlobRepository.UploadBlobAsync(PreviewImagesBlobContainerName, userId, imageId, previewImageStream, ImageFormats.Jpeg.DefaultMimeType);
+                    previewImageBlob = await BlobRepository.UploadBlobAsync(PreviewImagesBlobContainerName, imageId, previewImageStream);
                 }
 
                 // get a reference to the preview image with a SAS token
-                var getPolicy = new SharedAccessBlobPolicy
+                BlobSasBuilder blobSasBuilder = new BlobSasBuilder
                 {
-                    SharedAccessStartTime = DateTime.UtcNow.AddMinutes(-5), // to allow for clock skew
-                    SharedAccessExpiryTime = DateTime.UtcNow.AddHours(24),
-                    Permissions = SharedAccessBlobPermissions.Read
+                    StartsOn = DateTime.UtcNow.AddMinutes(-5),
+                    ExpiresOn = DateTime.UtcNow.AddHours(24)
                 };
-                var previewUrl = BlobRepository.GetSasTokenForBlob(previewImageBlob, getPolicy);
-            
+
+                blobSasBuilder.SetPermissions(BlobSasPermissions.Read);
+
+                var previewUrl = BlobRepository.GetSasTokenForBlob(previewImageBlob, blobSasBuilder);
+
                 // publish an event into the Event Grid topic
                 var eventSubject = $"{userId}/{imageId}";
-                await EventGridPublisherService.PostEventGridEventAsync(EventTypes.Images.ImageCreated, eventSubject, new ImageCreatedEventData { PreviewUri = previewUrl, Category = categoryId});
+                await EventGridPublisherService.PostEventGridEventAsync(EventTypes.Images.ImageCreated, eventSubject, new ImageCreatedEventData { PreviewUri = previewUrl, Category = categoryId });
 
                 return (CompleteAddImageNoteResult.Success, previewUrl);
             }
@@ -139,28 +152,32 @@ namespace ContentReactor.Images.Services
 
         public async Task<ImageNoteDetails> GetImageNoteAsync(string id, string userId)
         {
-            var getPolicy = new SharedAccessBlobPolicy
+            BlobSasBuilder blobSasBuilder = new BlobSasBuilder
             {
-                SharedAccessStartTime = DateTime.UtcNow.AddMinutes(-5), // to allow for clock skew
-                SharedAccessExpiryTime = DateTime.UtcNow.AddHours(24),
-                Permissions = SharedAccessBlobPermissions.Read
+                StartsOn = DateTime.UtcNow.AddMinutes(-5),
+                ExpiresOn = DateTime.UtcNow.AddHours(14)
             };
 
+            blobSasBuilder.SetPermissions(BlobSasPermissions.Read);
+
             // get the full-size blob, if it exists
-            var imageBlob = await BlobRepository.GetBlobAsync(FullImagesBlobContainerName, userId, id, true);
+            var imageBlob = await BlobRepository.GetBlobAsync(FullImagesBlobContainerName, id);
             if (imageBlob == null)
             {
                 return null;
             }
-            var imageUrl = BlobRepository.GetSasTokenForBlob(imageBlob, getPolicy);
-            imageBlob.Metadata.TryGetValue(CaptionMetadataName, out var caption);
+
+            var imageUrl = BlobRepository.GetSasTokenForBlob(imageBlob, blobSasBuilder);
+
+            var response = await imageBlob.GetPropertiesAsync();
+            response.Value.Metadata.TryGetValue(CaptionMetadataName, out var caption);
 
             // get the preview blob, if it exists
-            var previewBlob = await BlobRepository.GetBlobAsync(PreviewImagesBlobContainerName, userId, id);
+            var previewBlob = await BlobRepository.GetBlobAsync(PreviewImagesBlobContainerName, id);
             string previewUrl = null;
             if (previewBlob != null)
             {
-                previewUrl = BlobRepository.GetSasTokenForBlob(previewBlob, getPolicy);
+                previewUrl = BlobRepository.GetSasTokenForBlob(previewBlob, blobSasBuilder);
             }
 
             return new ImageNoteDetails
@@ -174,19 +191,21 @@ namespace ContentReactor.Images.Services
 
         public async Task<ImageNoteSummaries> ListImageNotesAsync(string userId)
         {
-            var blobs = await BlobRepository.ListBlobsInFolderAsync(FullImagesBlobContainerName, userId);
-            var getPolicy = new SharedAccessBlobPolicy
+            var blobs = await BlobRepository.ListBlobsAsync(FullImagesBlobContainerName);
+
+            BlobSasBuilder blobSasBuilder = new BlobSasBuilder
             {
-                SharedAccessStartTime = DateTime.UtcNow.AddMinutes(-5), // to allow for clock skew
-                SharedAccessExpiryTime = DateTime.UtcNow.AddHours(24),
-                Permissions = SharedAccessBlobPermissions.Read
+                StartsOn = DateTime.UtcNow.AddMinutes(-5),
+                ExpiresOn = DateTime.UtcNow.AddHours(24)
             };
+
+            blobSasBuilder.SetPermissions(BlobSasPermissions.Read);
 
             var blobListQueries = blobs
                 .Select(async b => new ImageNoteSummary
                 {
                     Id = b.Name.Split('/')[1],
-                    Preview = BlobRepository.GetSasTokenForBlob(await BlobRepository.GetBlobAsync(PreviewImagesBlobContainerName, userId, b.Name.Split('/')[1]), getPolicy)
+                    Preview = BlobRepository.GetSasTokenForBlob(await BlobRepository.GetBlobAsync(PreviewImagesBlobContainerName, b.Name.Split('/')[1]), blobSasBuilder)
                 })
                 .ToList();
             await Task.WhenAll(blobListQueries);
@@ -201,8 +220,8 @@ namespace ContentReactor.Images.Services
         public async Task DeleteImageNoteAsync(string id, string userId)
         {
             // delete both image blobs
-            var deleteFullImageTask = BlobRepository.DeleteBlobAsync(FullImagesBlobContainerName, userId, id);
-            var deletePreviewImageTask = BlobRepository.DeleteBlobAsync(PreviewImagesBlobContainerName, userId, id);
+            var deleteFullImageTask = BlobRepository.DeleteBlobAsync(FullImagesBlobContainerName, id);
+            var deletePreviewImageTask = BlobRepository.DeleteBlobAsync(PreviewImagesBlobContainerName, id);
             await Task.WhenAll(deleteFullImageTask, deletePreviewImageTask);
 
             // fire an event into the Event Grid topic
@@ -213,7 +232,7 @@ namespace ContentReactor.Images.Services
         public async Task<UpdateImageNoteCaptionResult> UpdateImageNoteCaptionAsync(string id, string userId)
         {
             // get the full-size blob, if it exists
-            var imageBlob = await BlobRepository.GetBlobAsync(FullImagesBlobContainerName, userId, id, true);
+            var imageBlob = await BlobRepository.GetBlobAsync(FullImagesBlobContainerName, id);
             if (imageBlob == null)
             {
                 return UpdateImageNoteCaptionResult.NotFound;
@@ -221,13 +240,13 @@ namespace ContentReactor.Images.Services
 
             // get the image bytes
             var bytes = await BlobRepository.GetBlobBytesAsync(imageBlob);
-            
+
             // get the caption
             var caption = await ImageCaptionService.GetImageCaptionAsync(bytes);
 
             // update the blob with the new caption
-            imageBlob.Metadata[CaptionMetadataName] = caption;
-            await BlobRepository.UpdateBlobMetadataAsync(imageBlob);
+            var metaData = new Dictionary<string, string> { { CaptionMetadataName, caption } };
+            await BlobRepository.UpdateBlobMetadataAsync(imageBlob, metaData);
 
             // fire an event into the Event Grid topic
             var eventSubject = $"{userId}/{id}";

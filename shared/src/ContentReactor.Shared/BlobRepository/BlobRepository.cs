@@ -1,132 +1,137 @@
-﻿using System;
+﻿using Azure;
+using Azure.Storage;
+using Azure.Storage.Blobs;
+using Azure.Storage.Blobs.Models;
+using Azure.Storage.Blobs.Specialized;
+using Azure.Storage.Sas;
+using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.WindowsAzure.Storage;
-using Microsoft.WindowsAzure.Storage.Blob;
 
 namespace ContentReactor.Shared.BlobRepository
 {
     public interface IBlobRepository
     {
-        CloudBlockBlob CreatePlaceholderBlob(string containerName, string folderName, string blobId);
-        Task DownloadBlobAsync(CloudBlockBlob blob, Stream stream);
-        Task<CloudBlockBlob> UploadBlobAsync(string containerName, string folderName, string blobId, Stream stream, string contentType);
-        Task<CloudBlockBlob> GetBlobAsync(string containerName, string folderName, string blobId, bool includeAttributes = false);
-        Task<IList<CloudBlockBlob>> ListBlobsInFolderAsync(string containerName, string folderName);
-        Task<bool> BlobExistsAsync(CloudBlockBlob blob);
-        Task DeleteBlobAsync(string containerName, string folderName, string blobId);
-        Task UpdateBlobMetadataAsync(CloudBlockBlob blob);
-        string GetSasTokenForBlob(CloudBlockBlob blob, SharedAccessBlobPolicy sasPolicy);
-        Task<byte[]> GetBlobBytesAsync(CloudBlockBlob blob);
+        BlockBlobClient CreatePlaceholderBlob(string containerName, string blobId);
+        Task DownloadBlobAsync(BlockBlobClient blob, Stream stream);
+        Task<BlockBlobClient> UploadBlobAsync(string containerName, string blobId, Stream stream);
+        Task<BlockBlobClient> GetBlobAsync(string containerName, string blobId);
+        Task<IList<BlobItem>> ListBlobsAsync(string containerName);
+        Task<Response<bool>> BlobExistsAsync(BlockBlobClient blob);
+        Task DeleteBlobAsync(string containerName, string blobId);
+        Task UpdateBlobMetadataAsync(BlockBlobClient blob, IDictionary<string, string> metaData);
+        string GetSasTokenForBlob(BlockBlobClient blob, BlobSasBuilder sasBuilder);
+        Task<byte[]> GetBlobBytesAsync(BlockBlobClient blob);
     }
 
     public class BlobRepository : IBlobRepository
     {
-        private static readonly CloudStorageAccount StorageAccount = CloudStorageAccount.Parse(Environment.GetEnvironmentVariable("BlobConnectionString"));
-        private static readonly CloudBlobClient BlobClient;
+        private static readonly BlobServiceClient BlobServiceClient;
 
         static BlobRepository()
         {
             // connect to Azure Storage
-            BlobClient = StorageAccount.CreateCloudBlobClient();
+            string serviceUri = Environment.GetEnvironmentVariable("STORAGE_BLOB_SERVICE_URI");
+            var credential = new StorageSharedKeyCredential(Environment.GetEnvironmentVariable("STORAGE_ACCOUNT_NAME"), Environment.GetEnvironmentVariable("STORAGE_ACCOUNT_KEY"));
+            BlobServiceClient = new BlobServiceClient(new Uri(serviceUri), credential);
         }
 
-        public CloudBlockBlob CreatePlaceholderBlob(string containerName, string folderName, string blobId)
+        public BlockBlobClient CreatePlaceholderBlob(string containerName, string blobId)
         {
-            var container = BlobClient.GetContainerReference(containerName);
-            var folder = container.GetDirectoryReference(folderName);
-            var blob = folder.GetBlockBlobReference(blobId);
+            var container = BlobServiceClient.GetBlobContainerClient(containerName);
+            container.CreateIfNotExists();
+            var blob = container.GetBlockBlobClient(blobId);
 
             return blob;
         }
 
-        public Task DownloadBlobAsync(CloudBlockBlob blob, Stream stream)
+        public async Task DownloadBlobAsync(BlockBlobClient blob, Stream stream)
         {
-            return blob.DownloadToStreamAsync(stream);
+            await blob.DownloadToAsync(stream);
         }
-        
-        public async Task<CloudBlockBlob> UploadBlobAsync(string containerName, string folderName, string blobId, Stream stream, string contentType)
+
+        public async Task<BlockBlobClient> UploadBlobAsync(string containerName, string blobId, Stream stream)
         {
-            var container = BlobClient.GetContainerReference(containerName);
-            var folder = container.GetDirectoryReference(folderName);
-            var blob = folder.GetBlockBlobReference(blobId);
+            var container = BlobServiceClient.GetBlobContainerClient(containerName);
+            await container.CreateIfNotExistsAsync();
+            var blob = container.GetBlockBlobClient(blobId);
 
             // upload blob
-            blob.Properties.ContentType = contentType;
-            await blob.UploadFromStreamAsync(stream);
+            await blob.UploadAsync(stream);
 
             return blob;
         }
 
-        public async Task<CloudBlockBlob> GetBlobAsync(string containerName, string folderName, string blobId, bool includeAttributes = false)
+        public async Task<BlockBlobClient> GetBlobAsync(string containerName, string blobId)
         {
-            var container = BlobClient.GetContainerReference(containerName);
-            var folder = container.GetDirectoryReference(folderName);
-            var blob = folder.GetBlockBlobReference(blobId);
+            var container = BlobServiceClient.GetBlobContainerClient(containerName);
+            await container.CreateIfNotExistsAsync();
+            var blob = container.GetBlockBlobClient(blobId);
 
-            if (! await blob.ExistsAsync())
+            if (!await blob.ExistsAsync())
             {
                 return null;
             }
-            if (includeAttributes)
-            {
-                await blob.FetchAttributesAsync();
-            }
 
             return blob;
         }
 
-        public async Task<IList<CloudBlockBlob>> ListBlobsInFolderAsync(string containerName, string folderName)
+        public async Task<IList<BlobItem>> ListBlobsAsync(string containerName)
         {
-            var container = BlobClient.GetContainerReference(containerName);
-            var folder = container.GetDirectoryReference(folderName);
+            var container = BlobServiceClient.GetBlobContainerClient(containerName);
+            await container.CreateIfNotExistsAsync();
 
-            // list all blobs in folder
-            var blobsInFolder = new List<CloudBlockBlob>();
-            var continuationToken = new BlobContinuationToken();
-            do
+            var blobs = new List<BlobItem>();
+            await foreach (var blob in container.GetBlobsAsync())
             {
-                var currentPage = await folder.ListBlobsSegmentedAsync(true, BlobListingDetails.Metadata, 100, continuationToken, null, null);
-                blobsInFolder.AddRange(currentPage.Results.OfType<CloudBlockBlob>());
-                continuationToken = currentPage.ContinuationToken;
-            } while (continuationToken != null);
+                blobs.Add(blob);
+            }
 
-            return blobsInFolder;
+            return blobs;
         }
 
-        public Task<bool> BlobExistsAsync(CloudBlockBlob blob)
+        public Task<Response<bool>> BlobExistsAsync(BlockBlobClient blob)
         {
             return blob.ExistsAsync();
         }
 
-        public Task DeleteBlobAsync(string containerName, string folderName, string blobId)
+        public async Task DeleteBlobAsync(string containerName, string blobName)
         {
-            var container = BlobClient.GetContainerReference(containerName);
-            var folder = container.GetDirectoryReference(folderName);
-            var blob = folder.GetBlockBlobReference(blobId);
-            return blob.DeleteIfExistsAsync();
+            var container = BlobServiceClient.GetBlobContainerClient(containerName);
+            await container.CreateIfNotExistsAsync();
+            var blob = container.GetBlockBlobClient(blobName);
+
+            await blob.DeleteIfExistsAsync(DeleteSnapshotsOption.IncludeSnapshots);
         }
 
-        public async Task UpdateBlobMetadataAsync(CloudBlockBlob blob)
+        public async Task UpdateBlobMetadataAsync(BlockBlobClient blob, IDictionary<string, string> metaData)
         {
-            var metadataUpdate = blob.SetMetadataAsync();
-            var propertiesUpdate = blob.SetPropertiesAsync();
-            await Task.WhenAll(metadataUpdate, propertiesUpdate);
+            await blob.SetMetadataAsync(metaData);
         }
 
-        public string GetSasTokenForBlob(CloudBlockBlob blob, SharedAccessBlobPolicy sasPolicy)
+        public string GetSasTokenForBlob(BlockBlobClient blob, BlobSasBuilder sasBuilder)
         {
-            var sasBlobToken = blob.GetSharedAccessSignature(sasPolicy);
-            return blob.Uri + sasBlobToken;
+            // Create a SharedKeyCredential that we can use to sign the SAS token
+            var credential = new StorageSharedKeyCredential(Environment.GetEnvironmentVariable("STORAGE_ACCOUNT_NAME"), Environment.GetEnvironmentVariable("STORAGE_ACCOUNT_KEY"));
+
+            // Build a SAS URI
+            UriBuilder sasUri = new UriBuilder(blob.Uri)
+            {
+                Query = sasBuilder.ToSasQueryParameters(credential).ToString()
+            };
+
+            return sasUri.Uri.ToString();
         }
 
-        public async Task<byte[]> GetBlobBytesAsync(CloudBlockBlob blob)
+        // Currently Azure.Storage.Blob doesn't has DownloadToByteArrayAsync() API, remove comments once API released.
+        public async Task<byte[]> GetBlobBytesAsync(BlockBlobClient blob)
         {
-            var bytes = new byte[blob.Properties.Length];
-            await blob.DownloadToByteArrayAsync(bytes, 0);
-            return bytes;
+            BlobDownloadInfo downloadInfo = await blob.DownloadAsync();
+            using var memoryStream = new MemoryStream();
+            await downloadInfo.Content.CopyToAsync(memoryStream);
+
+            return memoryStream.ToArray();
         }
     }
 }
