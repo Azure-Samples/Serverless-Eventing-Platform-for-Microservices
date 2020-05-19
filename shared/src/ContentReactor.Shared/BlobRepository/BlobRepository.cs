@@ -28,13 +28,15 @@ namespace ContentReactor.Shared.BlobRepository
     public class BlobRepository : IBlobRepository
     {
         private static readonly BlobServiceClient BlobServiceClient;
+        private static readonly string ServiceUri = Environment.GetEnvironmentVariable("STORAGE_BLOB_SERVICE_URI");
+        private static readonly string StorageAccountName = Environment.GetEnvironmentVariable("STORAGE_ACCOUNT_NAME");
+        private static readonly string StorageAccountKey = Environment.GetEnvironmentVariable("STORAGE_ACCOUNT_KEY");
 
         static BlobRepository()
         {
             // connect to Azure Storage
-            string serviceUri = Environment.GetEnvironmentVariable("STORAGE_BLOB_SERVICE_URI");
-            var credential = new StorageSharedKeyCredential(Environment.GetEnvironmentVariable("STORAGE_ACCOUNT_NAME"), Environment.GetEnvironmentVariable("STORAGE_ACCOUNT_KEY"));
-            BlobServiceClient = new BlobServiceClient(new Uri(serviceUri), credential);
+            StorageSharedKeyCredential credential = new StorageSharedKeyCredential(StorageAccountName, StorageAccountKey);
+            BlobServiceClient = new BlobServiceClient(new Uri(ServiceUri), credential);
         }
 
         public BlockBlobClient CreatePlaceholderBlob(string containerName, string blobId)
@@ -113,7 +115,7 @@ namespace ContentReactor.Shared.BlobRepository
         public string GetSasTokenForBlob(BlockBlobClient blob, BlobSasBuilder sasBuilder)
         {
             // Create a SharedKeyCredential that we can use to sign the SAS token
-            var credential = new StorageSharedKeyCredential(Environment.GetEnvironmentVariable("STORAGE_ACCOUNT_NAME"), Environment.GetEnvironmentVariable("STORAGE_ACCOUNT_KEY"));
+            var credential = new StorageSharedKeyCredential(StorageAccountName, StorageAccountKey);
 
             // Build a SAS URI
             UriBuilder sasUri = new UriBuilder(blob.Uri)
