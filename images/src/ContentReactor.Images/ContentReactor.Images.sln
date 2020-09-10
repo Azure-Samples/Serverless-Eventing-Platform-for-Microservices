@@ -1,11 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27130.2024
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30503.244
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ContentReactor.Shared", "..\..\..\shared\src\ContentReactor.Shared\ContentReactor.Shared.csproj", "{AC007F22-F486-4B75-A9A1-0E5C56B78B1D}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ContentReactor.Tests.FakeBlobRepository", "..\..\..\shared\src\ContentReactor.Tests.FakeBlobRepository\ContentReactor.Tests.FakeBlobRepository.csproj", "{67A2B611-F0A1-4D80-A34B-24D331DAF010}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ContentReactor.Images.Api", "ContentReactor.Images.Api\ContentReactor.Images.Api.csproj", "{71B278B7-8C1D-43FF-8B35-496F7D778DB0}"
 EndProject
@@ -27,10 +25,6 @@ Global
 		{AC007F22-F486-4B75-A9A1-0E5C56B78B1D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AC007F22-F486-4B75-A9A1-0E5C56B78B1D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AC007F22-F486-4B75-A9A1-0E5C56B78B1D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{67A2B611-F0A1-4D80-A34B-24D331DAF010}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{67A2B611-F0A1-4D80-A34B-24D331DAF010}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{67A2B611-F0A1-4D80-A34B-24D331DAF010}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{67A2B611-F0A1-4D80-A34B-24D331DAF010}.Release|Any CPU.Build.0 = Release|Any CPU
 		{71B278B7-8C1D-43FF-8B35-496F7D778DB0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{71B278B7-8C1D-43FF-8B35-496F7D778DB0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{71B278B7-8C1D-43FF-8B35-496F7D778DB0}.Release|Any CPU.ActiveCfg = Release|Any CPU

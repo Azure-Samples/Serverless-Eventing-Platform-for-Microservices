@@ -9,7 +9,7 @@ using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Azure.WebJobs.Host;
-using ContentReactor.Shared.BlobRepository;
+using ContentReactor.Shared.BlobHelper;
 using System.IO;
 using System.Net.Http;
 using ContentReactor.Images.Services.Converters;
@@ -22,7 +22,7 @@ namespace ContentReactor.Images.Api
     public static class ApiFunctions
     {
         private const string JsonContentType = "application/json";
-        public static IImagesService ImagesService = new ImagesService(new BlobRepository(), new ImageValidatorService(),  new ImagePreviewService(), new ImageCaptionService(new HttpClient()), new EventGridPublisherService());
+        public static IImagesService ImagesService = new ImagesService(new BlobHelper(), new ImageValidatorService(),  new ImagePreviewService(), new ImageCaptionService(new HttpClient()), new EventGridPublisherService());
         public static IUserAuthenticationService UserAuthenticationService = new QueryStringUserAuthenticationService();
 
         [FunctionName("BeginCreateImage")]

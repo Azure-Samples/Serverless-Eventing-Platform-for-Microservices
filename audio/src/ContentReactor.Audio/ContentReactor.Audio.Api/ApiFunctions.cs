@@ -7,7 +7,7 @@ using ContentReactor.Audio.Services.Converters;
 using ContentReactor.Audio.Services.Models.Requests;
 using ContentReactor.Audio.Services.Models.Results;
 using ContentReactor.Shared;
-using ContentReactor.Shared.BlobRepository;
+using ContentReactor.Shared.BlobHelper;
 using ContentReactor.Shared.UserAuthentication;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
@@ -21,7 +21,7 @@ namespace ContentReactor.Audio.Api
     public static class ApiFunctions
     {
         private const string JsonContentType = "application/json";
-        public static IAudioService AudioService = new AudioService(new BlobRepository(), new AudioTranscriptionService(), new EventGridPublisherService());
+        public static IAudioService AudioService = new AudioService(new BlobHelper(), new AudioTranscriptionService(), new EventGridPublisherService());
         public static IUserAuthenticationService UserAuthenticationService = new QueryStringUserAuthenticationService();
 
         [FunctionName("BeginCreateAudio")]

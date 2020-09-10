@@ -1,14 +1,17 @@
-﻿using Azure.Storage.Sas;
-using ContentReactor.Audio.Services.Models.Responses;
-using ContentReactor.Audio.Services.Models.Results;
-using ContentReactor.Shared;
-using ContentReactor.Shared.BlobRepository;
-using ContentReactor.Shared.EventSchemas.Audio;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Azure;
+using Azure.Storage.Blobs.Models;
+using Azure.Storage.Blobs.Specialized;
+using Azure.Storage.Sas;
+using ContentReactor.Audio.Services.Models.Responses;
+using ContentReactor.Audio.Services.Models.Results;
+using ContentReactor.Shared;
+using ContentReactor.Shared.BlobHelper;
+using ContentReactor.Shared.EventSchemas.Audio;
 
 namespace ContentReactor.Audio.Services
 {
@@ -24,7 +27,7 @@ namespace ContentReactor.Audio.Services
 
     public class AudioService : IAudioService
     {
-        protected IBlobRepository BlobRepository;
+        protected BlobHelper BlobHelper;
         protected IAudioTranscriptionService AudioTranscriptionService;
         protected IEventGridPublisherService EventGridPublisherService;
 
@@ -34,9 +37,9 @@ namespace ContentReactor.Audio.Services
         protected internal const string UserIdMetadataName = "userId";
         protected internal const int TranscriptPreviewLength = 100;
 
-        public AudioService(IBlobRepository blobRepository, IAudioTranscriptionService audioTranscriptionService, IEventGridPublisherService eventGridPublisherService)
+        public AudioService(BlobHelper blobHelper, IAudioTranscriptionService audioTranscriptionService, IEventGridPublisherService eventGridPublisherService)
         {
-            BlobRepository = blobRepository;
+            BlobHelper = blobHelper;
             AudioTranscriptionService = audioTranscriptionService;
             EventGridPublisherService = eventGridPublisherService;
         }
@@ -44,49 +47,41 @@ namespace ContentReactor.Audio.Services
         public (string id, string url) BeginAddAudioNote(string userId)
         {
             // generate an ID for this image note
-            var audioId = Guid.NewGuid().ToString();
+            string audioId = Guid.NewGuid().ToString();
 
             // create a blob placeholder (which will not have any contents yet)
-            var blob = BlobRepository.CreatePlaceholderBlob(AudioBlobContainerName, audioId);
+            BlockBlobClient blob = BlobHelper.GetBlobClient(AudioBlobContainerName, audioId);
 
-            // get a SAS token to allow the client to write the blob
-            BlobSasBuilder sasBuilder = new BlobSasBuilder
-            {
-                StartsOn = DateTime.UtcNow.AddMinutes(-5),
-                ExpiresOn = DateTime.UtcNow.AddHours(24),
-            };
 
-            sasBuilder.SetPermissions(BlobSasPermissions.Create);
-            sasBuilder.SetPermissions(BlobSasPermissions.Write);
+            string urlAndSas = BlobHelper.GetSasUriForBlob(blob, BlobSasPermissions.Create | BlobSasPermissions.Write);
 
-            var url = BlobRepository.GetSasTokenForBlob(blob, sasBuilder);
-
-            return (audioId, url);
+            return (audioId, urlAndSas);
         }
 
         public async Task<CompleteAddAudioNoteResult> CompleteAddAudioNoteAsync(string audioId, string userId, string categoryId)
         {
-            var imageBlob = await BlobRepository.GetBlobAsync(AudioBlobContainerName, audioId);
-            if (imageBlob == null || !await BlobRepository.BlobExistsAsync(imageBlob))
+            BlockBlobClient imageBlob = BlobHelper.GetBlobClient(AudioBlobContainerName, audioId);
+            if (imageBlob == null || !await imageBlob.ExistsAsync())
             {
                 // the blob hasn't actually been uploaded yet, so we can't process it
                 return CompleteAddAudioNoteResult.AudioNotUploaded;
             }
 
-            var response = await imageBlob.GetPropertiesAsync();
+            // if the blob already contains metadata then that means it has already been added
+            Response<BlobProperties> response = await imageBlob.GetPropertiesAsync();
             if (response.Value.Metadata.ContainsKey(CategoryIdMetadataName))
             {
                 return CompleteAddAudioNoteResult.AudioAlreadyCreated;
             }
 
             // set the blob metadata
-            var metaData = new Dictionary<string, string>
+            var metadata = new Dictionary<string, string>
             {
                 { CategoryIdMetadataName, categoryId },
                 { UserIdMetadataName, userId }
             };
 
-            await BlobRepository.UpdateBlobMetadataAsync(imageBlob, metaData);
+            await imageBlob.SetMetadataAsync(metadata);
 
             // publish an event into the Event Grid topic
             var subject = $"{userId}/{audioId}";
@@ -98,37 +93,29 @@ namespace ContentReactor.Audio.Services
         public async Task<AudioNoteDetails> GetAudioNoteAsync(string id, string userId)
         {
             // get the blob, if it exists
-            var audioBlob = await BlobRepository.GetBlobAsync(AudioBlobContainerName, id);
+            BlockBlobClient audioBlob = BlobHelper.GetBlobClient(AudioBlobContainerName, id);
             if (audioBlob == null)
             {
                 return null;
             }
 
-            // get a SAS token for the blob
-            BlobSasBuilder sasBuilder = new BlobSasBuilder
-            {
-                StartsOn = DateTime.UtcNow.AddMinutes(-5),
-                ExpiresOn = DateTime.UtcNow.AddHours(24),
-            };
-
-            sasBuilder.SetPermissions(BlobSasPermissions.Read);
-            var audioUrl = BlobRepository.GetSasTokenForBlob(audioBlob, sasBuilder);
+            string audioUrlAndSas = BlobHelper.GetSasUriForBlob(audioBlob, BlobSasPermissions.Read);
 
             // get the transcript out of the blob metadata
-            var response = await audioBlob.GetPropertiesAsync();
+            Response<BlobProperties> response = await audioBlob.GetPropertiesAsync();
             response.Value.Metadata.TryGetValue(TranscriptMetadataName, out var transcript);
 
             return new AudioNoteDetails
             {
                 Id = id,
-                AudioUrl = audioUrl,
+                AudioUrl = audioUrlAndSas,
                 Transcript = transcript
             };
         }
 
         public async Task<AudioNoteSummaries> ListAudioNotesAsync(string userId)
         {
-            var blobs = await BlobRepository.ListBlobsAsync(AudioBlobContainerName);
+            IList<BlobItem> blobs = await BlobHelper.ListBlobsAsync(AudioBlobContainerName);
             var blobSummaries = blobs
                 .Select(b => new AudioNoteSummary
                 {
@@ -146,7 +133,8 @@ namespace ContentReactor.Audio.Services
         public async Task DeleteAudioNoteAsync(string id, string userId)
         {
             // delete the blog
-            await BlobRepository.DeleteBlobAsync(AudioBlobContainerName, id);
+            BlockBlobClient blob = BlobHelper.GetBlobClient(AudioBlobContainerName, id);
+            await blob.DeleteIfExistsAsync(DeleteSnapshotsOption.IncludeSnapshots);
 
             // fire an event into the Event Grid topic
             var subject = $"{userId}/{id}";
@@ -156,7 +144,7 @@ namespace ContentReactor.Audio.Services
         public async Task<string> UpdateAudioTranscriptAsync(string id, string userId)
         {
             // get the blob
-            var audioBlob = await BlobRepository.GetBlobAsync(AudioBlobContainerName, id);
+            BlockBlobClient audioBlob = BlobHelper.GetBlobClient(AudioBlobContainerName, id);
             if (audioBlob == null)
             {
                 return null;
@@ -166,21 +154,21 @@ namespace ContentReactor.Audio.Services
             string transcript;
             using (var audioBlobStream = new MemoryStream())
             {
-                await BlobRepository.DownloadBlobAsync(audioBlob, audioBlobStream);
+                await audioBlob.DownloadToAsync(audioBlobStream);
 
                 // send to Cognitive Services and get back a transcript
                 transcript = await AudioTranscriptionService.GetAudioTranscriptFromCognitiveServicesAsync(audioBlobStream);
             }
 
             // update the blob's metadata
-            var metaData = new Dictionary<string, string>
+            var metadata = new Dictionary<string, string>
             {
                 { TranscriptMetadataName, transcript }
             };
 
-            await audioBlob.SetMetadataAsync(metaData);
+            await audioBlob.SetMetadataAsync(metadata);
             // create a preview form of the transcript
-            var transcriptPreview = transcript.Truncate(TranscriptPreviewLength);
+            string transcriptPreview = transcript.Truncate(TranscriptPreviewLength);
 
             // fire an event into the Event Grid topic
             var subject = $"{userId}/{id}";

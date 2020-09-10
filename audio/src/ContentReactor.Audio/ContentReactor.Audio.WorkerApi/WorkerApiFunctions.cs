@@ -8,14 +8,14 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Azure.WebJobs.Host;
 using ContentReactor.Audio.Services;
 using ContentReactor.Shared;
-using ContentReactor.Shared.BlobRepository;
+using ContentReactor.Shared.BlobHelper;
 
 namespace ContentReactor.Audio.WorkerApi
 {
     public static class WorkerApiFunctions
     {
         private static readonly IEventGridSubscriberService EventGridSubscriberService = new EventGridSubscriberService();
-        private static readonly IAudioService AudioService = new AudioService(new BlobRepository(), new AudioTranscriptionService(), new EventGridPublisherService());
+        private static readonly IAudioService AudioService = new AudioService(new BlobHelper(), new AudioTranscriptionService(), new EventGridPublisherService());
 
         [FunctionName("UpdateAudioTranscript")]
         public static async Task<IActionResult> UpdateAudioTranscript(
