@@ -5,7 +5,7 @@ using System.Web.Http;
 using ContentReactor.Images.Services;
 using ContentReactor.Images.Services.Models.Results;
 using ContentReactor.Shared;
-using ContentReactor.Shared.BlobRepository;
+using ContentReactor.Shared.BlobHelper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
@@ -17,7 +17,7 @@ namespace ContentReactor.Images.WorkerApi
     public static class WorkerApiFunctions
     {
         private static readonly IEventGridSubscriberService EventGridSubscriberService = new EventGridSubscriberService();
-        private static readonly IImagesService ImagesService = new ImagesService(new BlobRepository(), new ImageValidatorService(),  new ImagePreviewService(), new ImageCaptionService(new HttpClient()), new EventGridPublisherService());
+        private static readonly IImagesService ImagesService = new ImagesService(new BlobHelper(), new ImageValidatorService(),  new ImagePreviewService(), new ImageCaptionService(new HttpClient()), new EventGridPublisherService());
         
         [FunctionName("UpdateImageCaption")]
         public static async Task<IActionResult> UpdateImageCaption(

@@ -28,7 +28,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\shared\src\ContentReactor.Shared\ContentReactor.Shared.csproj" />
-    <ProjectReference Include="..\..\..\..\shared\src\ContentReactor.Tests.FakeBlobRepository\ContentReactor.Tests.FakeBlobRepository.csproj" />
     <ProjectReference Include="..\ContentReactor.Images.Services\ContentReactor.Images.Services.csproj" />
   </ItemGroup>
 

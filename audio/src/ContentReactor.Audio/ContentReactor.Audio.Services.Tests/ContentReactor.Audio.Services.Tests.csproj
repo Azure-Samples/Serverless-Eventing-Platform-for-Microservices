@@ -14,7 +14,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\shared\src\ContentReactor.Tests.FakeBlobRepository\ContentReactor.Tests.FakeBlobRepository.csproj" />
     <ProjectReference Include="..\ContentReactor.Audio.Services\ContentReactor.Audio.Services.csproj" />
   </ItemGroup>
 
