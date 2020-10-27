@@ -1,8 +1,8 @@
----
+--------
 services: functions, event-grid, cosmos-db
 platforms: dotnet
 author: nzthiago
----
+--------
 
 # Content Reactor: Serverless Microservice Sample for Azure
 
@@ -484,3 +484,4 @@ Events are displayed as notifications against a category.
 
 ![Screen 16](/_docs/screens/screen16.png)
 
+Hello world
