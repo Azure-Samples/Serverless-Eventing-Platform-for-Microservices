@@ -2,7 +2,7 @@
 
 ## Deploying Content Reactor
 
-Content Reactor can be built and deployed into your own Azure subscription. You can use Azure Pipelines to run builds and releases, or if you prefer, you can run the build and deployment steps manually. We assume that you have an Azure subscription available to run the sample; [you can get a free trial Azure subscription here](https://azure.microsoft.com/en-us/free/).
+Content Reactor can be built and deployed into your own Azure subscription. You can use Azure Pipelines to run builds and releases, or if you prefer, you can run the build and deployment steps manually. We assume that you have an Azure subscription available to run the sample. [Create a new Azure account, and try Cognitive Services for free.](https://azure.microsoft.com/free/cognitive-services/)
 
 This guide explains the steps to build and deploy Content Reactor, both using Azure Pipelines and manually. For manual deployments we suggest using the [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest), a cross-platform command-line interface for Azure.
 
