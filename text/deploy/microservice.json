@@ -30,6 +30,9 @@
         "cosmosDbAccountName": "[concat(variables('resourceNamePrefix'), 'db', parameters('uniqueResourceNameSuffix'))]",
         "cosmosDbDatabaseName": "Text",
         "cosmosDbCollectionName": "Text",
+        
+        "storageAccountName": "[concat(variables('resourceNamePrefix'), 'stgacc', parameters('uniqueResourceNameSuffix'))]",
+
 
         "eventGridTopicResourceId": "[resourceId(parameters('eventsResourceGroupName'), 'Microsoft.EventGrid/topics', parameters('eventGridTopicName'))]"
     },
@@ -88,7 +91,7 @@
                     "type": "config",
                     "apiVersion": "2014-11-01",
                     "properties": {
-                        "FUNCTIONS_EXTENSION_VERSION": "beta",
+                        "FUNCTIONS_EXTENSION_VERSION": "~3",
                         "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('Microsoft.Insights/components', variables('applicationInsightsName')), '2014-04-01').InstrumentationKey]",
                         "EventGridTopicEndpoint": "[reference(variables('eventGridTopicResourceId'), '2018-01-01').endpoint]",
                         "EventGridTopicKey": "[listKeys(variables('eventGridTopicResourceId'), '2018-01-01').key1]",
@@ -96,12 +99,14 @@
                         "CosmosDBAccountKey": "[listKeys(variables('cosmosDbAccountName'), '2015-04-08').primaryMasterKey]",
                         "DatabaseName": "[variables('cosmosDbDatabaseName')]",
                         "CollectionName": "[variables('cosmosDbCollectionName')]",
-                        "AzureWebJobsSecretStorageType":"Files"
+                        "AzureWebJobsSecretStorageType":"Files",
+                        "AzureWebJobsStorage":"[concat('DefaultEndpointsProtocol=https;AccountName=', variables('storageAccountName'), ';AccountKey=', listKeys(variables('storageAccountName'),'2015-05-01-preview').key1)]"
                     },
                     "dependsOn": [
                         "[resourceId('Microsoft.Web/sites', variables('functionsApiAppName'))]",
                         "[resourceId('Microsoft.Insights/components', variables('applicationInsightsName'))]",
-                        "[resourceId('Microsoft.DocumentDB/databaseAccounts', variables('cosmosDbAccountName'))]"
+                        "[resourceId('Microsoft.DocumentDB/databaseAccounts', variables('cosmosDbAccountName'))]",
+                        "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]"
                     ]
                 }
             ],
