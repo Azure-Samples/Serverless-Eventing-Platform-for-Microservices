@@ -35,6 +35,8 @@
         "cognitiveServicesAccountName": "[concat(variables('resourceNamePrefix'), 'cs', parameters('uniqueResourceNameSuffix'))]",
         "cognitiveServicesSearchApiUrl": "https://api.cognitive.microsoft.com/bing/v7.0/images/search",
         "bigHugeThesaurusApiUrl": "http://words.bighugelabs.com/api/2/",
+        
+         "storageAccountName": "[concat(variables('resourceNamePrefix'), 'stgacc', parameters('uniqueResourceNameSuffix'))]",
 
         "eventGridTopicResourceId": "[resourceId(parameters('eventsResourceGroupName'), 'Microsoft.EventGrid/topics', parameters('eventGridTopicName'))]"
     },
