@@ -136,7 +136,7 @@
                         "[resourceId('Microsoft.Web/sites', variables('functionsApiAppName'))]",
                         "[resourceId('Microsoft.Insights/components', variables('applicationInsightsName'))]",
                         "[resourceId('Microsoft.CognitiveServices/accounts', variables('cognitiveServicesAccountName'))]",
-                        "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]",
+                        "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]"
                     ]
                 }
             ],
@@ -177,12 +177,13 @@
                         "BigHugeThesaurusApiEndpoint": "[variables('bigHugeThesaurusApiUrl')]",
                         "BigHugeThesaurusApiKey": "[parameters('bigHugeThesaurusApiKey')]",
                         "AzureWebJobsSecretStorageType":"Files",
-                        "AzureWebJobsStorage":""
+                       "AzureWebJobsStorage":"[concat('DefaultEndpointsProtocol=https;AccountName=', variables('storageAccountName'), ';AccountKey=', listKeys(variables('storageAccountName'),'2015-05-01-preview').key1)]"
                     },
                     "dependsOn": [
                         "[resourceId('Microsoft.Web/sites', variables('functionsWorkerApiAppName'))]",
                         "[resourceId('Microsoft.Insights/components', variables('applicationInsightsName'))]",
-                        "[resourceId('Microsoft.CognitiveServices/accounts', variables('cognitiveServicesAccountName'))]"
+                        "[resourceId('Microsoft.CognitiveServices/accounts', variables('cognitiveServicesAccountName'))]",
+                        "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]"
                     ]
                 }
             ],
