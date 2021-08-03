@@ -37,6 +37,28 @@
         "eventGridTopicResourceId": "[resourceId(parameters('eventsResourceGroupName'), 'Microsoft.EventGrid/topics', parameters('eventGridTopicName'))]"
     },
     "resources": [
+         {
+            "name": "[variables('storageAccountName')]",
+            "type": "Microsoft.Storage/storageAccounts",
+            "location": "[resourceGroup().location]",
+            "apiVersion": "2017-06-01",
+            "sku": {
+                "name": "Standard_LRS"
+            },
+            "kind": "BlobStorage",
+            "properties": {
+                "accessTier": "Hot",
+                "supportsHttpsTrafficOnly": true,
+                "encryption": {
+                    "services": {
+                        "blob": {
+                            "enabled": true
+                        }
+                    },
+                    "keySource": "Microsoft.Storage"
+                }
+            }
+        },
         {
             "name": "[variables('applicationInsightsName')]",
             "type": "Microsoft.Insights/components",
