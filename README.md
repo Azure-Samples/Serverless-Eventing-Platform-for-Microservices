@@ -2,7 +2,6 @@
 services: functions, event-grid, cosmos-db
 platforms: dotnet
 author: nzthiago
-Test Change : BTR
 --------
 
 # Content Reactor: Serverless Microservice Sample for Azure
